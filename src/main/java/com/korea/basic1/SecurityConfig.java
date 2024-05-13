@@ -23,12 +23,21 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
             http.authorizeHttpRequests((authorizeHttpRequests) -> authorizeHttpRequests
                             .requestMatchers(new AntPathRequestMatcher("/**")).permitAll())
                     .headers((headers) -> headers.addHeaderWriter(
-                            new XFrameOptionsHeaderWriter(XFrameOptionsHeaderWriter.XFrameOptionsMode.SAMEORIGIN)));
+                            new XFrameOptionsHeaderWriter(XFrameOptionsHeaderWriter.XFrameOptionsMode.SAMEORIGIN)))
+                    .formLogin((formLogin) -> formLogin
+                    .loginPage("/user/login")
+                    .defaultSuccessUrl("/"))
+            ;
             return http.build();
         }
 
         @Bean
         PasswordEncoder passwordEncoder() {
             return new BCryptPasswordEncoder();
+        }
+
+        @Bean
+        AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+            return authenticationConfiguration.getAuthenticationManager();
         }
     }
