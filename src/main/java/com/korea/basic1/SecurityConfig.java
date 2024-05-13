@@ -24,9 +24,15 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
                             .requestMatchers(new AntPathRequestMatcher("/**")).permitAll())
                     .headers((headers) -> headers.addHeaderWriter(
                             new XFrameOptionsHeaderWriter(XFrameOptionsHeaderWriter.XFrameOptionsMode.SAMEORIGIN)))
+                    //로그인
                     .formLogin((formLogin) -> formLogin
                     .loginPage("/user/login")
                     .defaultSuccessUrl("/"))
+                    //로그아웃
+                    .logout((logout) -> logout
+                            .logoutRequestMatcher(new AntPathRequestMatcher("/user/logout"))
+                            .logoutSuccessUrl("/")
+                            .invalidateHttpSession(true))
             ;
             return http.build();
         }
