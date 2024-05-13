@@ -46,9 +46,7 @@ public class UserController {
             return "signup_form";
         }
 
-        userService.create(userCreateForm.getUsername(),
-                userCreateForm.getEmail(), userCreateForm.getPassword1(),userCreateForm.getUsernickname());
-
+        // 불필요한 userService.create 호출을 제거함
         return "redirect:/";
     }
 
