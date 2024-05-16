@@ -1,0 +1,144 @@
+<link href="https://cdn.jsdelivr.net/npm/daisyui@4.10.2/dist/full.min.css" rel="stylesheet" type="text/css"/>
+<script src="https://cdn.tailwindcss.com"></script>
+
+<style>
+</style>
+
+<!--네비바-->
+<nav th:replace="~{navbar :: navbarFragment}"></nav>
+
+<!-- 네비게이션바 끝 -->
+
+<div class="flex w-90 lg:flex-row mt-10 lg:mt-20 mx-2 lg:mx-10 lg:mb-10">
+
+<!-- 프로필 -->
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6"> <!-- 가운데로 정렬 -->
+            <h4 class="text-center">Profile</h4>
+            <hr>
+            <!-- 유저 정보 -->
+            <div class="card-body text-center"> <!-- text-center를 추가하여 내용을 가운데 정렬 -->
+
+                <div class="avatar">
+                    <div class="w-24 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
+                      <img src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg" />
+                    </div>
+                  </div>
+                <!-- 프로필 이미지 -->
+                <div class="mx-auto" style="width: 128px;"> <!-- 이미지를 가운데로 정렬하는 부분 -->
+
+
+                    <div class="flex flex-col gap-4 w-52">
+                        <div class="w-24 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
+                           
+                            <img th:src="'data:image/png;base64,' + ${user.base64EncodedProfileImage}" alt="User's Profile Image" class="w-100 h-100"/>
+                            <img th:unless="${user.profileImage != null}" src="data:image/png;base64,${user.getBase64EncodedProfileImage()}" alt="User's Profile Image" class="w-100 h-100"/>
+                    </div>
+                          <div class="flex flex-col gap-4">
+                            <div class="skeleton h-4 w-20"></div>
+                            <div class="skeleton h-4 w-28"></div>
+                          </div>
+                        </div>
+                        <div class="skeleton h-32 w-full"></div>
+                      </div>
+
+
+
+                    <div class="rounded-circle overflow-hidden" style="width: 128px; height: 128px;">
+                        <img th:src="'data:image/png;base64,' + ${user.base64EncodedProfileImage}" alt="User's Profile Image" class="w-100 h-100"/>
+                        <img th:unless="${user.profileImage != null}" src="data:image/png;base64,${user.getBase64EncodedProfileImage()}" alt="User's Profile Image" class="w-100 h-100"/>
+                    </div>
+                </div>
+                    <!-- 유저의 이름 -->
+                    <h1 sec:authorize="isAuthenticated()" th:text="${#authentication.principal.username}">User Profile</h1>
+                    <!-- 유저의 이메일 -->
+                    <p sec:authorize="isAuthenticated()" th:text="${email}">user@example.com</p>
+                    <!-- 유저의 닉네임 -->
+                    <p sec:authorize="isAuthenticated()" th:text="${userNickname}">User Nickname</p>
+                </div>
+                <div>
+                    <!-- 유저의 활동 정보 -->
+                    <p sec:authorize="isAuthenticated()" th:text="'질문 수 ' + ${#lists.size(questions)} + ' |'+' 댓글 수 ' + ${#lists.size(answers)} + ' |'+ ' 답글 수 ' + ${#lists.size(comments)}"></p>
+                </div>
+                <!-- 프로필 수정 버튼 -->
+                <div class="row justify-content-center">
+                    <div class="col-md-4 mb-3 border">
+                        <div class="card-body text-center">
+                            <a class="btn btn-lg text-decoration-none custom-btn border-0" sec:authorize="isAuthenticated()" th:href="@{/user/profileModify}">프로필 수정</a>
+                        </div>
+                    </div>
+                    <!-- 기타 버튼들 추가 -->
+                    <!-- 게시물 등록 버튼 -->
+                    <div class="col-md-4 mb-3 border">
+                        <div class="card-body text-center">
+                            <a class="btn btn-lg text-decoration-none custom-btn border-0" sec:authorize="isAuthenticated()" th:href="@{/question/create}">게시물 등록</a>
+                        </div>
+                    </div>
+                    <!-- 로그아웃 버튼 -->
+                    <div class="col-md-4 mb-3 border">
+                        <div class="card-body text-center">
+                            <a class="btn btn-lg text-decoration-none custom-btn border-0" sec:authorize="isAuthenticated()" th:href="@{/user/logout}">로그아웃</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 프로필 끝 -->
+<!-- 등록한 정보들 -->
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-6 mx-auto">
+            <div class="row section-margin">
+                <!-- QUESTION 섹션 -->
+                <div class="col-md-4">
+                    <div class="card list-container">
+                        <div class="card-body">
+                            <h4 class="text-center">QUESTION</h4>
+                            <hr>
+                            <ul>
+                                <li th:each="question : ${questions}">
+                                    <p th:text="${question.subject}">게시물 제목</p>
+                                </li>
+                            </ul>
+                            <p th:if="${#lists.isEmpty(questions)}" class="text-muted text-center">질문이 없습니다.</p>
+                        </div>
+                    </div>
+                </div>
+                <!-- ANSWER 섹션 -->
+                <div class="col-md-4">
+                    <div class="card list-container">
+                        <div class="card-body">
+                            <h4 class="text-center">ANSWER</h4>
+                            <hr>
+                            <ul>
+                                <li th:each="answer : ${answers}">
+                                    <p th:text="${answer.content}">게시물 제목</p>
+                                </li>
+                            </ul>
+                            <p th:if="${#lists.isEmpty(answers)}" class="text-muted text-center">댓글이 없습니다.</p>
+                        </div>
+                    </div>
+                </div>
+                <!-- COMMENT 섹션 -->
+                <div class="col-md-4">
+                    <div class="card list-container">
+                        <div class="card-body">
+                            <h4 class="text-center">COMMENT</h4>
+                            <hr>
+                            <ul>
+                                <li th:each="comment : ${comments}">
+                                    <p th:text="${comment.content}">게시물 제목</p>
+                                </li>
+                            </ul>
+                            <p th:if="${#lists.isEmpty(comments)}" class="text-muted text-center">답글이 없습니다.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>

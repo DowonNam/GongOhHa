@@ -28,6 +28,11 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
                     .formLogin((formLogin) -> formLogin
                     .loginPage("/user/login")
                     .defaultSuccessUrl("/"))
+                    .oauth2Login(oauth2 -> oauth2
+                            .loginPage("/user/login")
+                            .defaultSuccessUrl("/")
+                            .failureUrl("/user/login?error=true")
+                    )
                     //로그아웃
                     .logout((logout) -> logout
                             .logoutRequestMatcher(new AntPathRequestMatcher("/user/logout"))

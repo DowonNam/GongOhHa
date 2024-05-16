@@ -1,5 +1,6 @@
 package com.korea.basic1.User;
 
+import com.korea.basic1.DataNotFoundException;
 import com.korea.basic1.DuplicateEmailException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -30,6 +31,15 @@ public class UserService {
 
         this.userRepository.save(user);
         return user;
+    }
+
+    public SiteUser getUserByUsername(String username) {
+        Optional<SiteUser> siteUser = this.userRepository.findByUsername(username);
+        if (siteUser.isPresent()) {
+            return siteUser.get();
+        } else {
+            throw new DataNotFoundException("siteuser not found");
+        }
     }
 
 }
