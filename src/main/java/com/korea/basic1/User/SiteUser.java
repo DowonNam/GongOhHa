@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
 import java.util.Base64;
 
 @Getter
@@ -22,12 +23,13 @@ public class SiteUser {
     @Column(unique = true)
     private String email;
 
-    private String usernickname;
+    private String userNickname;
 
     @Lob
     private byte[] profileImage;
 
     // 다른 메서드들...
+    private LocalDateTime createDate;
 
     public String getBase64EncodedProfileImage() {
         if (profileImage != null) {

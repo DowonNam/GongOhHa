@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -15,7 +16,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public SiteUser create(String username, String email, String password, String usernickname) {
+    public SiteUser create(String username, String email, String password, String userNickname) {
 
         // 이메일 중복 검사
         Optional<SiteUser> existingUser = userRepository.findByEmail(email);
@@ -27,7 +28,8 @@ public class UserService {
         user.setUsername(username);
         user.setEmail(email);
         user.setPassword(passwordEncoder.encode(password));
-        user.setUsernickname(usernickname);
+        user.setUserNickname(userNickname);
+        user.setCreateDate(LocalDateTime.now());
 
         this.userRepository.save(user);
         return user;

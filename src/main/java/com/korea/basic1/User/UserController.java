@@ -7,15 +7,20 @@ import com.korea.basic1.Comment.Comment;
 import com.korea.basic1.Comment.CommentService;
 import com.korea.basic1.Question.Question;
 import com.korea.basic1.Question.QuestionService;
+import com.korea.basic1.Security.MyUser;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -32,8 +37,8 @@ public class UserController {
     private final CommentService commentService;
     private final AnswerService answerService;
 
-    @GetMapping("/profile/{username}")
-    public String userProfile(Model model, Principal principal) {
+    @GetMapping("/studyBoard/{username}")
+    public String userBoard(Model model, Principal principal) {
         // 현재 로그인된 사용자의 유저네임을 Principal 객체에서 추출
         String username = principal.getName();
 
@@ -54,10 +59,41 @@ public class UserController {
         model.addAttribute("questions", questions);
         model.addAttribute("comments", comments);
         model.addAttribute("answers", answers);
-        model.addAttribute("userNickname",user.getUsernickname());
+        model.addAttribute("userNickname",user.getUserNickname());
         model.addAttribute("userId", user.getId());
         model.addAttribute("username", user.getUsername());
         model.addAttribute("email", user.getEmail());
+
+        // 프로필 페이지 뷰 이름 반환
+        return "studyBoard";
+    }
+
+    @GetMapping("/profile/{userNickname}")
+    public String userProfile(Model model, Authentication authentication) {
+        // 현재 로그인된 사용자의 유저네임을 Principal 객체에서 추출
+        MyUser user = (MyUser) authentication.getPrincipal();
+
+        // 유저네임을 사용하여 사용자 정보 조회
+        SiteUser foundedUser = this.userService.getUserByUsername(user.getUsername());
+
+        // 사용자 정보가 null인지 확인
+        if (foundedUser == null) {
+            return "userNotFound"; // 사용자가 존재하지 않을 경우 적절한 처리 필요
+        }
+
+        // 모델에 사용자 정보 추가
+        model.addAttribute("user", user);
+        List<Question> questions = questionService.findByAuthorId(foundedUser.getId());
+        List<Comment> comments = commentService.findByUserId(foundedUser.getId());
+        List<Answer> answers = answerService.findByAuthorId(foundedUser.getId());
+
+        model.addAttribute("questions", questions);
+        model.addAttribute("comments", comments);
+        model.addAttribute("answers", answers);
+        model.addAttribute("userNickname",foundedUser.getUserNickname());
+        model.addAttribute("userId", foundedUser.getId());
+        model.addAttribute("username", foundedUser.getUsername());
+        model.addAttribute("email", foundedUser.getEmail());
 
         // 프로필 페이지 뷰 이름 반환
         return "userProfile_form";
