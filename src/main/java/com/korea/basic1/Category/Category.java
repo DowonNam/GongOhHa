@@ -1,5 +1,6 @@
 package com.korea.basic1.Category;
 
+
 import com.korea.basic1.Question.Question;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -12,7 +13,7 @@ import java.util.List;
 @Entity
 public class Category {
 
-    @jakarta.persistence.Id
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int Id;
 

@@ -3,12 +3,15 @@ package com.korea.basic1.Event;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.korea.basic1.Calendar.Calendar;
+import com.korea.basic1.User.SiteUser;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -35,4 +38,7 @@ public class Event {
     @JsonBackReference
     @ManyToOne(fetch = FetchType.LAZY)
     private Calendar calendar;
+
+    @ManyToMany(mappedBy = "events")
+    private Set<SiteUser> users = new HashSet<>();
 }

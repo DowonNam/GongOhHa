@@ -1,11 +1,14 @@
 package com.korea.basic1.User;
 
+import com.korea.basic1.Event.Event;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.Base64;
+import java.util.HashSet;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -28,7 +31,14 @@ public class SiteUser {
     @Lob
     private byte[] profileImage;
 
-    // 다른 메서드들...
+    @ManyToMany
+    @JoinTable(
+            name = "user_event",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "event_id")
+    )
+    private Set<Event> events = new HashSet<>();
+
     private LocalDateTime createDate;
 
     public String getBase64EncodedProfileImage() {
