@@ -1,7 +1,10 @@
 package com.korea.basic1.Security;
 
-import com.korea.basic1.User.SiteUser;
-import com.korea.basic1.User.UserRepository;
+import com.korea.basic1.Schedule.UserCalendar.CalendarService;
+import com.korea.basic1.Schedule.UserCalendar.UserCalendar;
+import com.korea.basic1.User.PersonalSchedule.PersonalScheduleRepository;
+import com.korea.basic1.User.User.SiteUser;
+import com.korea.basic1.User.User.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
@@ -19,6 +22,7 @@ import java.util.Map;
 public class MyOAuth2UserService extends DefaultOAuth2UserService {
 
     private final UserRepository userRepository;
+    private final CalendarService calendarService;
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
@@ -46,6 +50,15 @@ public class MyOAuth2UserService extends DefaultOAuth2UserService {
             siteUser.setUserNickname(mySocialUser.getName());
             siteUser.setEmail(mySocialUser.getEmail());
             siteUser.setCreateDate(LocalDateTime.now());
+
+            SiteUser savedUser = userRepository.save(siteUser);
+
+            // 새 사용자 등록 시 달력 생성
+            UserCalendar userCalendar = calendarService.createCalendar(savedUser);
+            savedUser.setUserCalendar(userCalendar);
+
+            //savedUser 자체로 레파지토리에 저장하면 오류가 나기 때문에, 다시 바꿔줌
+            savedUser = siteUser;
 
             userRepository.save(siteUser);
         }

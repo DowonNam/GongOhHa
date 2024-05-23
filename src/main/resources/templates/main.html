@@ -35,7 +35,7 @@
                             <a class="nav-link" sec:authorize="isAnonymous()" th:href="@{/user/login}">로그인</a>
                             <a class="nav-link" sec:authorize="isAuthenticated()" th:href="@{/user/logout}">로그아웃</a>
                         </li>
-                        <li><a th:href="@{calendar/1}">시험 일정 달력</a></li>
+                        <li><a th:href="@{userCalendar/1}">시험 일정 달력</a></li>
                         <li><a sec:authorize="isAuthenticated()" th:href="@{|/user/studyBoard/${#authentication.principal.username}|}">나의 공부 일정</a></li>
                         <li>
                             <details open>

@@ -1,12 +1,11 @@
 package com.korea.basic1.Security;
 
-import com.korea.basic1.User.SiteUser;
+import com.korea.basic1.User.User.SiteUser;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;

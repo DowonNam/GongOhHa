@@ -2,11 +2,10 @@ package com.korea.basic1.Security;
 
 
 
-import com.korea.basic1.User.SiteUser;
-import com.korea.basic1.User.UserRepository;
+import com.korea.basic1.User.User.SiteUser;
+import com.korea.basic1.User.User.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
