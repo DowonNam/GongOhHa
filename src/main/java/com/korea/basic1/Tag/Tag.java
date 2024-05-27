@@ -19,5 +19,5 @@ public class Tag {
     private String name;
 
     @OneToMany(mappedBy = "tag", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<GroupTag> noteTagList = new ArrayList<>();
+    private List<GroupTag> groupTagList = new ArrayList<>();
 }
