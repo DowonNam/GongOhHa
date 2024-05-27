@@ -12,6 +12,7 @@ import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -25,6 +26,7 @@ public class MyOAuth2UserService extends DefaultOAuth2UserService {
     private final CalendarService calendarService;
 
     @Override
+    @Transactional
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
 
         OAuth2User user = super.loadUser(userRequest);
@@ -51,15 +53,14 @@ public class MyOAuth2UserService extends DefaultOAuth2UserService {
             siteUser.setEmail(mySocialUser.getEmail());
             siteUser.setCreateDate(LocalDateTime.now());
 
-            SiteUser savedUser = userRepository.save(siteUser);
+            // 새 사용자 저장
+            siteUser = userRepository.save(siteUser);
 
-            // 새 사용자 등록 시 달력 생성
-            UserCalendar userCalendar = calendarService.createCalendar(savedUser);
-            savedUser.setUserCalendar(userCalendar);
+            // 새 사용자 등록 시 달력 생성 및 설정
+            UserCalendar userCalendar = calendarService.createCalendar(siteUser);
+            siteUser.setUserCalendar(userCalendar);
 
-            //savedUser 자체로 레파지토리에 저장하면 오류가 나기 때문에, 다시 바꿔줌
-            savedUser = siteUser;
-
+            // 업데이트된 사용자 저장
             userRepository.save(siteUser);
         }
 

@@ -12,32 +12,31 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.header.writers.frameoptions.XFrameOptionsHeaderWriter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
+import static org.springframework.security.config.Customizer.withDefaults;
+
 @Configuration
     @EnableWebSecurity
     public class SecurityConfig {
-        @Bean
-        SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-            http.authorizeHttpRequests((authorizeHttpRequests) -> authorizeHttpRequests
-                            .requestMatchers(new AntPathRequestMatcher("/**")).permitAll())
-                    .headers((headers) -> headers.addHeaderWriter(
-                            new XFrameOptionsHeaderWriter(XFrameOptionsHeaderWriter.XFrameOptionsMode.SAMEORIGIN)))
-                    //로그인
-                    .formLogin((formLogin) -> formLogin
-                    .loginPage("/user/login")
-                    .defaultSuccessUrl("/"))
-                    .oauth2Login(oauth2 -> oauth2
-                            .loginPage("/user/login")
-                            .defaultSuccessUrl("/")
-                            .failureUrl("/user/login?error=true")
-                    )
-                    //로그아웃
-                    .logout((logout) -> logout
-                            .logoutRequestMatcher(new AntPathRequestMatcher("/user/logout"))
-                            .logoutSuccessUrl("/")
-                            .invalidateHttpSession(true))
-            ;
-            return http.build();
-        }
+    @Bean
+    SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http.authorizeHttpRequests(authorizeHttpRequests -> authorizeHttpRequests
+                        .requestMatchers(new AntPathRequestMatcher("/**")).permitAll())
+                .headers(headers -> headers.addHeaderWriter(
+                        new XFrameOptionsHeaderWriter(XFrameOptionsHeaderWriter.XFrameOptionsMode.SAMEORIGIN)))
+                .formLogin(formLogin -> formLogin
+                        .loginPage("/user/login")
+                        .defaultSuccessUrl("/"))
+                .oauth2Login(oauth2 -> oauth2
+                        .loginPage("/user/login")
+                        .defaultSuccessUrl("/")
+                        .failureUrl("/user/login?error=true"))
+                .logout(logout -> logout
+                        .logoutRequestMatcher(new AntPathRequestMatcher("/user/logout"))
+                        .logoutSuccessUrl("/")
+                        .invalidateHttpSession(true))
+                .csrf(withDefaults());
+        return http.build();
+    }
 
         @Bean
         public PasswordEncoder passwordEncoder() {

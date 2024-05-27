@@ -13,12 +13,12 @@
 <nav th:replace="~{navbar :: navbarFragment}" class="navbar fixed top-0 z-50"></nav>
 
 <!-- 달력 및 세부 내용 -->
-<div class="flex mt-10 lg:mt-20 mx-2 lg:mx-10 lg:mb-10">
-
+<div class="mt-10 lg:mt-20 lg:mx-10 lg:mb-10 flex lg:flex-row gap-4">
     <!-- 달력 -->
-    <h1>시험 일정 달력</h1>
-    <footer th:replace="~{calendar :: calendarFragment}"></footer>
-    <div class="divider lg:divider-horizontal"></div>
+    <div class="lg:w-2/3">
+        <h1>시험 일정 달력</h1>
+        <footer th:replace="~{calendar :: calendarFragment}"></footer>
+    </div>
     <!-- 세부내용 -->
     <div class="flex flex-col lg:w-1/3 justify-center lg:justify-between gap-4 lg:gap-10 overflow-y-auto">
         <!-- 버튼 및 이번 달 일정 -->
@@ -44,7 +44,7 @@
                     </form>
                 </div>
                 <!-- 일정 리스트 -->
-                <div style="overflow-x: auto; width: 700px; height: 500px; border-radius: 10px; border: 0.3px solid lightgray;">
+                <div style="overflow-x: auto; width: 200%; height: 500px; border-radius: 10px; border: 0.3px solid lightgray;">
                     <table class="table" style="border-collapse: collapse; width: 100%;">
                         <!-- head -->
                         <thead style="background-color: lightgray;">
@@ -70,8 +70,7 @@
                             </td>
                             <td> <!-- 수정 버튼 부분 -->
                                 <!--onclick은 자바스크립트라 타임리프 문법 사용 x-->
-                                <button class="btn" onclick="openModal(this)" th:data-id="${event.id}">Op
-                                    en modal</button>
+                                <button class="btn" onclick="openModal(this)" th:data-id="${event.id}">Open modal</button>
                                 <!-- 모달 요소 -->
                                 <dialog th:id="${'eventModal_' + event.id}" class="modal">
                                     <div class="modal-box">
@@ -106,7 +105,7 @@
                 </div>
             </div>
             <!-- 일정 추가 버튼 -->
-            <div class="flex justify-between mt-4">
+            <div>
                 <button id="addEventBtn"
                         style="border-radius: 10px; padding: 10px 20px; border: none; background-color: black; color: white; text-align: center; display: inline-block; font-size: 16px; cursor: pointer;">
                     일정추가
@@ -119,5 +118,5 @@
 </body>
 </html>
 
-<!--풋화면-->
+<!-- 풋화면 -->
 <footer th:replace="~{footer :: footerFragment}"></footer>

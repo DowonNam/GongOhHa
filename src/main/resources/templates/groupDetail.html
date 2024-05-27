@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${group.name} + ' 그룹'">그룹 디테일</title>
+    <!-- Tailwind CSS 및 Daisy UI 추가 -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@1.14.0/dist/full.css" rel="stylesheet">
+    <style>
+        .container {
+            margin: 20px auto;
+            max-width: 800px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1 class="text-3xl font-bold mb-4" th:text="${group.name} + ' 그룹 상세보기'"></h1>
+
+    <!-- 그룹 편집 버튼 추가 -->
+    <div class="mb-4">
+        <a class="btn btn-primary" th:href="@{/group/edit/{id}(id=${group.id})}">그룹 편집</a>
+    </div>
+
+    <h2 class="text-2xl font-semibold mb-2">그룹 소개</h2>
+    <p class="mb-4" th:text="${group.goal}">그룹 소개 내용</p>
+
+    <h2 class="text-2xl font-semibold mb-2">그룹장</h2>
+    <p class="mb-4" th:text="${group.leader.userNickname}">그룹장 이름</p>
+
+    <h2 class="text-2xl font-semibold mb-2">멤버 구성</h2>
+    <table class="table table-zebra w-full">
+        <thead>
+        <tr>
+            <th>멤버 이름</th>
+            <th>멤버 프로필</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="member : ${group.members}">
+            <td th:text="${member.userNickname}"></td>
+            <td>
+                <a class="btn btn-info btn-xs" th:href="@{/user/detail/{id}(id=${member.id})}">Details</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- Tailwind 및 Daisy UI 추가 -->
+<script src="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/daisyui@1.14.0/dist/full.js"></script>
+</body>
+</html>

@@ -91,6 +91,7 @@ public class CalendarController {
 
     @GetMapping("/{userCalendarId}/events")
     public ResponseEntity<?> getEventsByCalendarId(@PathVariable(name = "userCalendarId") Long calendarId) {
+        System.out.println("Received calendar ID: " + calendarId);
         List<Event> events = eventService.findByCalendarId(calendarId);
         if (events != null && !events.isEmpty()) {
             return ResponseEntity.ok(events);

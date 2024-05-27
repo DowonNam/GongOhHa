@@ -57,6 +57,7 @@ public class UserService {
         }
     }
 
+
     public SiteUser getUserByUsername(String username) {
         Optional<SiteUser> siteUser = this.userRepository.findByUsername(username);
         if (siteUser.isPresent()) {

@@ -2,6 +2,7 @@ package com.korea.basic1.User.User;
 
 import com.korea.basic1.Schedule.Event.Event;
 import com.korea.basic1.Schedule.UserCalendar.UserCalendar;
+import com.korea.basic1.User.Group.Group;
 import com.korea.basic1.User.PersonalSchedule.PersonalSchedule;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -57,4 +58,7 @@ public class SiteUser {
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "calendar_id")
     private UserCalendar userCalendar;
+
+    @ManyToMany(mappedBy = "members")
+    private Set<Group> groups = new HashSet<>();
 }
