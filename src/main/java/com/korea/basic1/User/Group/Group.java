@@ -1,12 +1,15 @@
 package com.korea.basic1.User.Group;
 
+import com.korea.basic1.User.Group.GroupTag.GroupTag;
 import com.korea.basic1.User.User.SiteUser;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -35,5 +38,8 @@ public class Group {
     private Set<SiteUser> members = new HashSet<>();
 
     private LocalDateTime createDate;
+
+    @OneToMany(mappedBy = "group", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<GroupTag> groupTagList = new ArrayList<>();
 
 }

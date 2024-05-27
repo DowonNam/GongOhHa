@@ -55,6 +55,10 @@ public class GroupService {
         return groupRepository.save(group);
     }
 
+    public Group getGroup(Long id) {
+        return groupRepository.findById(id).orElseThrow();
+    }
+
     public List<Group> getAllGroups() {
         return groupRepository.findAll();
     }

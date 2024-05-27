@@ -55,7 +55,7 @@
                     </div>
                 </td>
                 <td>
-                    <span class="badge badge-ghost badge-sm">Desktop Support Technician</span>
+                    <span class="badge badge-ghost badge-sm" th:each="groupTag : ${group.groupTagList}" th:text="${groupTag.tag.name}">태그 목록</span>
                 </td>
                 <td th:text="${group.members.size()}">0</td>
                 <td>
