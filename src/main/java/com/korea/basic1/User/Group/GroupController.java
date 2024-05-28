@@ -12,8 +12,10 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Controller
 @RequiredArgsConstructor
@@ -90,8 +92,16 @@ public class GroupController {
             Group group = groupOpt.get();
             String username = principal.getName();
             boolean isLeader = groupService.isLeader(groupId, username);
+
+            // 멤버들을 가입 날짜와 이름으로 정렬 (null 값을 처리)
+            List<SiteUser> sortedMembers = group.getMembers().stream()
+                    .sorted(Comparator.comparing(SiteUser::getCreateDate, Comparator.nullsLast(Comparator.naturalOrder()))
+                            .thenComparing(SiteUser::getUserNickname, Comparator.nullsLast(Comparator.naturalOrder())))
+                    .collect(Collectors.toList());
+
             model.addAttribute("group", group);
             model.addAttribute("isLeader", isLeader);
+            model.addAttribute("sortedMembers", sortedMembers); // 정렬된 멤버 리스트 추가
             return "groupDetail";
         } else {
             return "error/404";

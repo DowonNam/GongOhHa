@@ -27,6 +27,7 @@ public class SiteUser {
     @Column(unique = true)
     private String email;
 
+    @Column(unique = true)
     private String userNickname;
 
     @Lob
