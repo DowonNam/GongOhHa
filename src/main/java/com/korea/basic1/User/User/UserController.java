@@ -8,6 +8,8 @@ import com.korea.basic1.Board.Comment.CommentService;
 import com.korea.basic1.Board.Question.Question;
 import com.korea.basic1.Board.Question.QuestionService;
 import com.korea.basic1.Security.MyUser;
+import com.korea.basic1.User.PersonalSchedule.PersonalSchedule;
+import com.korea.basic1.User.PersonalSchedule.PersonalScheduleService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -31,6 +33,7 @@ public class UserController {
     private final QuestionService questionService;
     private final CommentService commentService;
     private final AnswerService answerService;
+    private final PersonalScheduleService personalScheduleService;
 
     @GetMapping("/studyBoard/{username}")
     public String userBoard(Model model, Principal principal) {
@@ -45,6 +48,17 @@ public class UserController {
             return "userNotFound"; // 사용자가 존재하지 않을 경우 적절한 처리 필요
         }
 
+        // userCalendarId를 올바르게 추출
+        Long userCalendarId = user.getUserCalendar().getId();
+
+        // 사용자 개인 일정 조회
+        List<PersonalSchedule> schedules = personalScheduleService.getSchedulesByUser(user.getId());
+        if (schedules == null || schedules.isEmpty()) {
+            System.out.println("No schedules found for userId: " + user.getId());
+        } else {
+            System.out.println("Schedules found: " + schedules);
+        }
+
         // 모델에 사용자 정보 추가
         model.addAttribute("user", user);
         List<Question> questions = questionService.findByAuthorId(user.getId());
@@ -54,16 +68,16 @@ public class UserController {
         model.addAttribute("questions", questions);
         model.addAttribute("comments", comments);
         model.addAttribute("answers", answers);
-        model.addAttribute("userNickname",user.getUserNickname());
+        model.addAttribute("userNickname", user.getUserNickname());
         model.addAttribute("userId", user.getId());
         model.addAttribute("username", user.getUsername());
         model.addAttribute("email", user.getEmail());
-        model.addAttribute("userCalendarId",user.getUserCalendar());
+        model.addAttribute("userCalendarId", userCalendarId);
+        model.addAttribute("schedules", schedules); // 개인 일정 추가
 
         // 프로필 페이지 뷰 이름 반환
         return "studyBoard";
     }
-
     @GetMapping("/profile/{userNickname}")
     public String userProfile(Model model, Authentication authentication) {
         // 현재 로그인된 사용자의 유저네임을 Principal 객체에서 추출

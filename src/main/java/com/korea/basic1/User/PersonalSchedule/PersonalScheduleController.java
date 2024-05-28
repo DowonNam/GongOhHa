@@ -8,22 +8,24 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.util.List;
+
 @Controller
 @RequiredArgsConstructor
 public class PersonalScheduleController {
 
     private final PersonalScheduleService personalScheduleService;
 
-    @GetMapping("/schedules")
-    public String getSchedules(Model model, @RequestParam Long userId) {
-        model.addAttribute("schedules", personalScheduleService.getSchedulesByUser(userId));
-        return "schedules";
-    }
-
     @PostMapping("/schedules")
     public String addSubject(@RequestParam Long userId, @RequestParam String subject) {
         personalScheduleService.addSubject(userId, subject);
-        return "studyBoard";
+        return "redirect:/user/studyBoard/"+ userId;
+    }
+
+    @PostMapping("/schedules/delete")
+    public String deleteSubject(@RequestParam Long userId, @RequestParam Long scheduleId) {
+        personalScheduleService.deleteSchedule(scheduleId);
+        return "redirect:/user/studyBoard/" + userId;
     }
 
     @PostMapping("/study-time")

@@ -26,6 +26,10 @@ public class PersonalScheduleService {
         return personalScheduleRepository.save(schedule);
     }
 
+    public void deleteSchedule(Long scheduleId){
+        personalScheduleRepository.deleteById(scheduleId);
+    }
+
     public void recordStudyTime(Long scheduleId,int duration){
         PersonalSchedule schedule = personalScheduleRepository.findById(scheduleId)
                 .orElseThrow(()->new IllegalArgumentException("스케줄 아이디를 확인해주세요"));
@@ -34,9 +38,9 @@ public class PersonalScheduleService {
     }
 
     public List<PersonalSchedule> getSchedulesByUser(Long userId){
-        SiteUser user = userRepository.findById(userId)
-                .orElseThrow(()->new IllegalArgumentException("유저 아이디를 찾을 수 없습니다."));
-        return user.getPersonalSchedules();
+        List<PersonalSchedule> schedules = personalScheduleRepository.findBySiteUserId(userId);
+        System.out.println("Fetched schedules from DB: " + schedules); // 디버깅 출력
+        return schedules;
     }
 
     public void resetDailyStudyTimes(){

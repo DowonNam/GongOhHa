@@ -7,7 +7,7 @@
              style="display:none; position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%); background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); z-index: 1000;">
             <div>
                 <label>달력 번호:</label>
-                <input type="number" id="userCalendar_id" th:value="${userCalendarId}"><br>
+                <input type="number" id="userCalendar_id" readonly><br>
                 <label>제목:</label>
                 <input type="text" id="eventTitle"><br>
                 <label>시작 시간:</label>
@@ -20,6 +20,14 @@
                 </button>
             </div>
         </div>
+
+        <!-- 일정 추가 버튼 -->
+        <div class="flex justify-between mt-4">
+            <button id="addEventBtn"
+                    style="border-radius: 10px; padding: 10px 20px; border: none; background-color: black; color: white; text-align: center; display: inline-block; font-size: 16px; cursor: pointer;">
+                일정추가
+            </button>
+        </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
@@ -30,6 +38,12 @@
             var userCalendarId = calendarEl.getAttribute('data-calendar-id');
             console.log("User Calendar ID:", userCalendarId);
 
+            // 모달을 열 때 캘린더 아이디를 설정합니다.
+            document.getElementById('addEventBtn').addEventListener('click', function () {
+                document.getElementById('userCalendar_id').value = userCalendarId;
+                document.getElementById('eventModal').style.display = 'block';
+            });
+
             var calendar = new FullCalendar.Calendar(calendarEl, {
                 initialView: 'dayGridMonth',
             });
@@ -38,23 +52,23 @@
             // 캘린더 ID로 이벤트 불러오기
             fetchEventsForUserCalendar(userCalendarId, calendar);
 
-            document.getElementById('addEventBtn').addEventListener('click', function () {
-                document.getElementById('eventModal').style.display = 'block';
-            });
-
             document.getElementById('saveEvent').addEventListener('click', function () {
-                addEventToUserCalendar(calendar);
+                addEventToUserCalendar(calendar, userCalendarId);
             });
         });
 
         function fetchEventsForUserCalendar(userCalendarId, calendar) {
             fetch(`http://localhost:8088/userCalendar/${userCalendarId}/events`)
                 .then(response => {
-                    const contentType = response.headers.get("content-type");
-                    if (!response.ok || !contentType || !contentType.includes("application/json")) {
+                    console.log('Response status:', response.status, response.statusText); // 응답 상태 로그 추가
+                    if (!response.ok) {
                         return response.text().then(text => {
-                            throw new Error('서버에서 정상적인 JSON 응답이 아닙니다: ' + text);
+                            throw new Error(`서버에서 정상적인 응답을 받지 못했습니다. 상태 코드: ${response.status}, 내용: ${text}`);
                         });
+                    }
+                    const contentType = response.headers.get("content-type");
+                    if (!contentType || !contentType.includes("application/json")) {
+                        throw new Error(`서버에서 정상적인 JSON 응답이 아닙니다. Content-Type: ${contentType}`);
                     }
                     return response.json();
                 })
@@ -74,11 +88,11 @@
                 });
         }
 
-        function addEventToUserCalendar(calendar) {
-            var userCalendar_id = document.getElementById('userCalendar_id').value;
+        function addEventToUserCalendar(calendar, userCalendarId) {
             var title = document.getElementById('eventTitle').value;
             var start = document.getElementById('eventStart').value;
             var end = document.getElementById('eventEnd').value;
+            var registrationLink = ""; // 만약 registrationLink가 필요하다면 이곳에서 값을 설정하세요
 
             // 이벤트 객체를 생성합니다.
             var event = {
@@ -93,15 +107,19 @@
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    userCalendar_id: parseInt(userCalendar_id, 10),
+                    calendar_id: parseInt(userCalendarId, 10),
                     title: title,
                     startDate: event.start.toISOString(),
-                    endDate: event.end.toISOString()
+                    endDate: event.end.toISOString(),
+                    registrationLink: registrationLink
                 })
             })
                 .then(response => {
+                    console.log('Response status:', response.status, response.statusText); // 응답 상태 로그 추가
                     if (!response.ok) {
-                        throw new Error('네트워크 응답이 실패했습니다.');
+                        return response.text().then(text => {
+                            throw new Error(`네트워크 응답이 실패했습니다. 상태 코드: ${response.status}, 내용: ${text}`);
+                        });
                     }
                     return response.json();
                 })

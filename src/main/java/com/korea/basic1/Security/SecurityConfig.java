@@ -15,36 +15,45 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
-    @EnableWebSecurity
-    public class SecurityConfig {
+@EnableWebSecurity
+public class SecurityConfig {
     @Bean
     SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.authorizeHttpRequests(authorizeHttpRequests -> authorizeHttpRequests
-                        .requestMatchers(new AntPathRequestMatcher("/**")).permitAll())
-                .headers(headers -> headers.addHeaderWriter(
-                        new XFrameOptionsHeaderWriter(XFrameOptionsHeaderWriter.XFrameOptionsMode.SAMEORIGIN)))
+        http
+                .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers("/**").permitAll()
+                        .anyRequest().authenticated()
+                )
+
                 .formLogin(formLogin -> formLogin
                         .loginPage("/user/login")
                         .defaultSuccessUrl("/"))
+
                 .oauth2Login(oauth2 -> oauth2
                         .loginPage("/user/login")
                         .defaultSuccessUrl("/")
                         .failureUrl("/user/login?error=true"))
+
                 .logout(logout -> logout
                         .logoutRequestMatcher(new AntPathRequestMatcher("/user/logout"))
                         .logoutSuccessUrl("/")
                         .invalidateHttpSession(true))
-                .csrf(withDefaults());
+                .csrf(csrf -> csrf
+                        .ignoringRequestMatchers(
+                                new AntPathRequestMatcher("/userCalendar/**"),
+                                new AntPathRequestMatcher("/study-time")
+                        )
+                );
         return http.build();
     }
 
-        @Bean
-        public PasswordEncoder passwordEncoder() {
-            return new BCryptPasswordEncoder();
-        }
-
-        @Bean
-        AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
-            return authenticationConfiguration.getAuthenticationManager();
-        }
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
+
+    @Bean
+    AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
+    }
+}
