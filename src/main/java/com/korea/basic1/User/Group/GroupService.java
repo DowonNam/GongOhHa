@@ -16,6 +16,13 @@ public class GroupService {
     private final GroupRepository groupRepository;
     private final UserRepository userRepository;
 
+    // GroupService에 추가
+    public boolean isLeader(Long groupId, String username) {
+        Group group = groupRepository.findById(groupId)
+                .orElseThrow(() -> new IllegalArgumentException("그룹을 찾을 수 없습니다."));
+        return group.getLeader().getUsername().equals(username);
+    }
+
     public Group createGroup(String name, Principal principal) {
         String username = principal.getName();
         SiteUser leader = userRepository.findByUsername(username)
@@ -65,5 +72,11 @@ public class GroupService {
 
     public List<Group> getAllGroupsSortedByMembers() {
         return groupRepository.findAllOrderByMembersCountDesc();
+    }
+
+    public void deleteGroup(Long groupId) {
+        Group group = groupRepository.findById(groupId)
+                .orElseThrow(() -> new IllegalArgumentException("그룹을 찾을 수 없습니다."));
+        groupRepository.delete(group);
     }
 }

@@ -32,4 +32,6 @@ public class GroupTagService {
     public void delete(Long noteTagId) {
         groupTagRepository.deleteById(noteTagId);
     }
+
+
 }

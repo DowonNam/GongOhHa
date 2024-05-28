@@ -26,10 +26,14 @@ public class GroupController {
     private final UserRepository userRepository;
 
     @GetMapping("/edit/{groupId}")
-    public String editGroup(@PathVariable Long groupId, Model model) {
+    public String editGroup(@PathVariable Long groupId, Model model, Principal principal) {
         Optional<Group> groupOpt = groupRepository.findById(groupId);
         if (groupOpt.isPresent()) {
             Group group = groupOpt.get();
+            String username = principal.getName();
+            if (!groupService.isLeader(groupId, username)) {
+                return "error/403"; // 권한이 부족함을 알리는 적절한 뷰
+            }
             model.addAttribute("group", group);
             return "groupEdit";
         } else {
@@ -38,7 +42,11 @@ public class GroupController {
     }
 
     @PostMapping("/edit/{groupId}")
-    public String updateGroup(@PathVariable Long groupId, @RequestParam String name, @RequestParam String goal) {
+    public String updateGroup(@PathVariable Long groupId, @RequestParam String name, @RequestParam String goal, Principal principal) {
+        String username = principal.getName();
+        if (!groupService.isLeader(groupId, username)) {
+            return "error/403"; // 권한이 부족함을 알리는 적절한 뷰
+        }
         groupService.updateGroup(groupId, name, goal);
         return "redirect:/group/detail/" + groupId;
     }
@@ -76,11 +84,14 @@ public class GroupController {
     }
 
     @GetMapping("/detail/{groupId}")
-    public String getGroupDetail(@PathVariable Long groupId, Model model) {
+    public String getGroupDetail(@PathVariable Long groupId, Model model, Principal principal) {
         Optional<Group> groupOpt = groupRepository.findById(groupId);
         if (groupOpt.isPresent()) {
             Group group = groupOpt.get();
+            String username = principal.getName();
+            boolean isLeader = groupService.isLeader(groupId, username);
             model.addAttribute("group", group);
+            model.addAttribute("isLeader", isLeader);
             return "groupDetail";
         } else {
             return "error/404";
