@@ -3,6 +3,7 @@ package com.korea.basic1.User.PersonalSchedule;
 import com.korea.basic1.User.User.SiteUser;
 import com.korea.basic1.User.User.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -43,10 +44,11 @@ public class PersonalScheduleService {
         return schedules;
     }
 
+    @Scheduled(cron = "0 0 0 * * *") // 매일 자정에 실행
     public void resetDailyStudyTimes(){
         List<PersonalSchedule> schedules = personalScheduleRepository.findAll();
         LocalDateTime now = LocalDateTime.now();
-        for(PersonalSchedule schedule:schedules){
+        for(PersonalSchedule schedule : schedules){
             if(schedule.getLastReset().toLocalDate().isBefore(now.toLocalDate())){
                 schedule.setTotalTime(0);
                 schedule.setLastReset(now);

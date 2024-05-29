@@ -3,10 +3,7 @@ package com.korea.basic1.User.PersonalSchedule;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -15,6 +12,12 @@ import java.util.List;
 public class PersonalScheduleController {
 
     private final PersonalScheduleService personalScheduleService;
+
+    @GetMapping("/userCalendar/{userId}/schedules")
+    @ResponseBody
+    public List<PersonalSchedule> getSchedulesByUser(@PathVariable Long userId) {
+        return personalScheduleService.getSchedulesByUser(userId);
+    }
 
     @PostMapping("/schedules")
     public String addSubject(@RequestParam Long userId, @RequestParam String subject) {
