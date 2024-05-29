@@ -17,8 +17,6 @@
                 <button id="saveTimerButton" class="btn">타이머 저장</button>
                 <button id="resetButton" class="btn">초기화</button>
             </div>
-
-
             <!-- PersonalSchedule 리스트 -->
             <table class="table w-full mt-4">
                 <thead>
@@ -75,7 +73,7 @@
     <div class="divider lg:divider-horizontal"></div>
     <div class="flex-grow place-items-center lg:w-2/3">
         <!-- 달력 -->
-        <footer th:replace="~{calendar :: calendarFragment}"></footer>
+        <footer th:replace="~{calendarPersonal :: calendarPersonalFragment}"></footer>
 
         <!-- 세부내용 -->
         <div class="flex-grow place-items-center lg:w-2/3">
@@ -247,6 +245,18 @@
         .then(data => {
             console.log("타이머 값 저장 성공", data);
             // 저장이 성공하면 타이머를 멈춘 상태로 유지
+             calendar.addEvent({
+                        title: data.title,
+                        start: data.startDate,
+                        end: data.endDate
+                    });
+
+                    // 입력 필드 초기화 및 이벤트 모달 숨기기
+                    document.getElementById('eventModal').style.display = 'none';
+                    document.getElementById('userCalendar_id').value = '';
+                    document.getElementById('eventTitle').value = '';
+                    document.getElementById('eventStart').value = '';
+                    document.getElementById('eventEnd').value = '';
         })
         .catch(error => {
             console.error('타이머 값 저장 오류:', error);

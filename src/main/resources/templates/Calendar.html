@@ -90,9 +90,11 @@
 
         function addEventToUserCalendar(calendar, userCalendarId) {
             var title = document.getElementById('eventTitle').value;
-            var start = document.getElementById('eventStart').value;
-            var end = document.getElementById('eventEnd').value;
+            var start = new Date(document.getElementById('eventStart').value);
+            var end = new Date(document.getElementById('eventEnd').value);
             var registrationLink = ""; // 만약 registrationLink가 필요하다면 이곳에서 값을 설정하세요
+            start.setTime(start.getTime() + (9 * 60 * 60 * 1000));
+            end.setTime(end.getTime() + (9 * 60 * 60 * 1000));
 
             // 이벤트 객체를 생성합니다.
             var event = {
@@ -160,13 +162,16 @@
             var modifiedEventTitle = document.getElementById('modifiedEventTitle_' + eventId).value;
             var modifiedEventStart = document.getElementById('modifiedEventStart_' + eventId).value;
             var modifiedEventEnd = document.getElementById('modifiedEventEnd_' + eventId).value;
+            modifiedEventStart.setTime(modifiedEventStart.getTime() + (9 * 60 * 60 * 1000));
+            modifiedEventEnd.setTime(modifiedEventEnd.getTime() + (9 * 60 * 60 * 1000));
+
 
             console.log("Saving event:", eventId, modifiedEventTitle, modifiedEventStart, modifiedEventEnd);
 
             var updatedEvent = {
                 title: modifiedEventTitle,
-                startDate: modifiedEventStart,
-                endDate: modifiedEventEnd
+                startDate: new Date(modifiedEventStart),
+                endDate: new Date(modifiedEventEnd)
             };
 
             console.log("Updated event data:", updatedEvent);
