@@ -5,13 +5,16 @@ import com.korea.basic1.Schedule.Event.Event;
 import com.korea.basic1.Schedule.Event.EventForm;
 import com.korea.basic1.Schedule.Event.EventService;
 import com.korea.basic1.User.User.SiteUser;
+import com.korea.basic1.User.User.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.logging.Level;
@@ -24,6 +27,7 @@ public class CalendarController {
 
     private final CalendarService calendarService;
     private final EventService eventService;
+    private final UserService userService;
 
 
     @GetMapping("/modify/{eventId}")
@@ -58,13 +62,25 @@ public class CalendarController {
 
     @GetMapping("/{userCalendarId}")
     public String viewCalendar(Model model, @PathVariable(name = "userCalendarId") String calendarId,
-                               @RequestParam(name = "targetMonth", required = false, defaultValue = "0") int targetMonth) {
+                               @RequestParam(name = "targetMonth", required = false, defaultValue = "0") int targetMonth,
+                               Principal principal) {
         Long parsedCalendarId;
         try {
             parsedCalendarId = Long.parseLong(calendarId);
         } catch (NumberFormatException e) {
             // 예외 처리
             return "errorPage"; // 오류가 발생하면 적절한 에러 페이지로 리다이렉트합니다.
+        }
+
+        // 현재 로그인된 사용자의 유저네임을 Principal 객체에서 추출
+        String username = principal.getName();
+
+        // 유저네임을 사용하여 사용자 정보 조회
+        SiteUser siteUser = this.userService.getUserByUsername(username);
+
+        // 사용자 정보가 null인지 확인
+        if (siteUser == null) {
+            return "userNotFound"; // 사용자가 존재하지 않을 경우 적절한 처리 필요
         }
 
         List<Event> events = this.eventService.findByCalendarId(parsedCalendarId);
@@ -85,6 +101,8 @@ public class CalendarController {
         model.addAttribute("nextMonth", nextMonth);
         model.addAttribute("userCalendarId", parsedCalendarId);
         model.addAttribute("eventsForMonth", eventsForMonth); // 이벤트 목록을 모델에 추가
+        model.addAttribute("siteUser", siteUser); // siteUser 객체를 모델에 추가
+        model.addAttribute("events", events);
 
         return "calendarForm";
     }
@@ -116,6 +134,12 @@ public class CalendarController {
             Logger.getLogger(CalendarController.class.getName()).log(Level.SEVERE, "Internal server error", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("{\"error\":\"Internal server error occurred.\"}");
         }
+    }
+
+    @PostMapping("/{eventId}/copy/{calendarId}")
+    public ResponseEntity<Event> copyEventToUserCalendar(@PathVariable Long eventId, @PathVariable Long calendarId) {
+        Event copiedEvent = eventService.copyEventToUserCalendar(eventId, calendarId);
+        return ResponseEntity.ok(copiedEvent);
     }
 
 }

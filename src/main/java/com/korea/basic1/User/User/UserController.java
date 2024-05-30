@@ -104,6 +104,7 @@ public class UserController {
         model.addAttribute("userId", foundedUser.getId());
         model.addAttribute("username", foundedUser.getUsername());
         model.addAttribute("email", foundedUser.getEmail());
+        model.addAttribute("userCalendarId", foundedUser.getUserCalendar().getId());
 
         // 프로필 페이지 뷰 이름 반환
         return "userProfile_form";

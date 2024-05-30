@@ -160,10 +160,7 @@
                     document.getElementById('eventStart').value = '';
                     document.getElementById('eventEnd').value = '';
         })
-        .catch(error => {
-            console.error('타이머 값 저장 오류:', error);
-            alert('오류: ' + error.message);
-        });
+
     }
 
     document.querySelectorAll('.start-timer').forEach(function(element) {

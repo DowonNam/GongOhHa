@@ -1,7 +1,10 @@
 package com.korea.basic1.Schedule.Event;
 
+import com.korea.basic1.Schedule.UserCalendar.CalendarRepository;
 import com.korea.basic1.Schedule.UserCalendar.UserCalendar;
 import com.korea.basic1.Schedule.UserCalendar.CalendarService;
+import com.korea.basic1.User.User.SiteUser;
+import com.korea.basic1.User.User.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,6 +19,8 @@ public class EventService {
 
     private final EventRepository eventRepository;
     private final CalendarService calendarService;
+    private final UserRepository userRepository;
+    private final CalendarRepository calendarRepository;
 
     public List<Event> getEventsForMonth(List<Event> allEvents, int targetMonth) {
         // 주어진 이벤트 목록(allEvents)을 스트림으로 변환
@@ -40,6 +45,7 @@ public class EventService {
         e.setUserCalendar(userCalendar);
         return eventRepository.save(e); // 저장된 이벤트 객체 반환
     }
+
 
     public Event modify(Long eventId, String title, LocalDateTime startDate, LocalDateTime endDate, String registrationLink, Long calendarId) {
         // 1. 주어진 이벤트 ID를 사용하여 데이터베이스에서 해당 이벤트를 조회합니다.
@@ -77,4 +83,26 @@ public class EventService {
         return eventRepository.findById(eventId)
                 .orElseThrow(() -> new EntityNotFoundException("Event not found with ID: " + eventId));
     }
+
+    public Event copyEventToUserCalendar(Long eventId, Long calendarId) {
+        Event originalEvent = eventRepository.findById(eventId)
+                .orElseThrow(() -> new IllegalArgumentException("이벤트 아이디를 찾을 수 없습니다"));
+
+        UserCalendar userCalendar = calendarRepository.findById(calendarId)
+                .orElseThrow(() -> new IllegalArgumentException("캘린더를 찾을 수 없습니다."));
+
+        Event newEvent = new Event();
+        newEvent.setTitle(originalEvent.getTitle());
+        newEvent.setCreateDate(LocalDateTime.now());
+        newEvent.setModifyDate(LocalDateTime.now());
+        newEvent.setStartDate(originalEvent.getStartDate());
+        newEvent.setEndDate(originalEvent.getEndDate());
+        newEvent.setRegistrationLink(originalEvent.getRegistrationLink());
+        newEvent.setUserCalendar(userCalendar);
+
+        eventRepository.save(newEvent);
+
+        return newEvent;
+    }
+
 }

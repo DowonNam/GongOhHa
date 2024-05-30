@@ -1,6 +1,7 @@
     <div th:fragment="calendarFragment" th:with="calendarId=${userCalendarId}">
     <div>
         <div id="userCalendar" th:data-calendar-id="${userCalendarId}"></div>
+        <div id="userId" th:data-user-id="${userId}"></div>
         <br>
         <!-- 이벤트 추가 모달 -->
         <div id="eventModal"
@@ -34,9 +35,12 @@
     <script src="https://cdn.jsdelivr.net/npm/long/dist/long.js"></script> <!-- Long.js 라이브러리 추가 -->
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            var calendarEl = document.getElementById('userCalendar');
+             var calendarEl = document.getElementById('userCalendar');
             var userCalendarId = calendarEl.getAttribute('data-calendar-id');
-            console.log("User Calendar ID:", userCalendarId);
+            var userIdEl = document.getElementById('userId');
+            var userId = userIdEl.getAttribute('data-user-id');
+            console.log("사용자 캘린더 ID:", userCalendarId);
+            console.log("사용자 ID:", userId);
 
             // 모달을 열 때 캘린더 아이디를 설정합니다.
             document.getElementById('addEventBtn').addEventListener('click', function () {
@@ -160,18 +164,19 @@
         function saveModifiedEvent(button) {
             var eventId = button.getAttribute('data-id');
             var modifiedEventTitle = document.getElementById('modifiedEventTitle_' + eventId).value;
-            var modifiedEventStart = document.getElementById('modifiedEventStart_' + eventId).value;
-            var modifiedEventEnd = document.getElementById('modifiedEventEnd_' + eventId).value;
-            modifiedEventStart.setTime(modifiedEventStart.getTime() + (9 * 60 * 60 * 1000));
-            modifiedEventEnd.setTime(modifiedEventEnd.getTime() + (9 * 60 * 60 * 1000));
+            var modifiedEventStart = new Date(document.getElementById('modifiedEventStart_' + eventId).value);
+    var modifiedEventEnd = new Date(document.getElementById('modifiedEventEnd_' + eventId).value);
+
+    modifiedEventStart.setTime(modifiedEventStart.getTime() + (9 * 60 * 60 * 1000));
+    modifiedEventEnd.setTime(modifiedEventEnd.getTime() + (9 * 60 * 60 * 1000));
 
 
             console.log("Saving event:", eventId, modifiedEventTitle, modifiedEventStart, modifiedEventEnd);
 
             var updatedEvent = {
                 title: modifiedEventTitle,
-                startDate: new Date(modifiedEventStart),
-                endDate: new Date(modifiedEventEnd)
+                startDate: new Date(modifiedEventStart).toISOString(),
+                endDate: new Date(modifiedEventEnd).toISOString()
             };
 
             console.log("Updated event data:", updatedEvent);
