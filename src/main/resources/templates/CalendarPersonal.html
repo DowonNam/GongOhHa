@@ -37,21 +37,44 @@
                     if (!contentType || !contentType.includes("application/json")) {
                         throw new Error(`서버에서 정상적인 JSON 응답이 아닙니다. Content-Type: ${contentType}`);
                     }
-                    return response.json();
+                    return response.text(); // JSON 대신 텍스트로 반환
                 })
-                .then(personalSchedulesData => {
-                    console.log('받은 데이터:', personalSchedulesData); // 받은 원본 데이터 출력
-                    personalSchedulesData.forEach(personalSchedule => {
-                        console.log('개인 일정 데이터:', personalSchedule); // 각 개인 일정 데이터 로그 출력
-                        if (personalSchedule.lastReset && personalSchedule.subject && personalSchedule.totalTime) {
-                            calendar.addEvent({
-                                title: `${personalSchedule.subject}`,
-                                start: new Date(personalSchedule.lastReset)
-                            });
-                        } else {
-                            console.error('잘못된 개인 일정 데이터:', personalSchedule);
+                .then(text => {
+                    console.log('받은 원본 텍스트:', text); // 받은 원본 텍스트 출력
+                    try {
+                        const personalSchedulesData = JSON.parse(text); // 직접 파싱 시도
+                        console.log('받은 데이터:', personalSchedulesData); // 받은 데이터 출력
+                        if (!Array.isArray(personalSchedulesData)) {
+                            throw new Error('서버에서 배열 형태의 데이터를 받지 못했습니다.');
                         }
-                    });
+                        personalSchedulesData.forEach(personalSchedule => {
+                            console.log('개인 일정 데이터:', personalSchedule); // 각 개인 일정 데이터 로그 출력
+                            if (personalSchedule.lastReset && personalSchedule.subject && typeof personalSchedule.totalTime === 'number') {
+                                let eventDate = new Date(personalSchedule.lastReset).toISOString().split('T')[0]; // 날짜만 추출
+                                if (!eventDate) {
+                                    console.error('유효하지 않은 날짜:', personalSchedule.lastReset);
+                                } else {
+                                    // totalTime을 시간, 분, 초로 변환
+                                    let totalTimeInSeconds = personalSchedule.totalTime;
+                                    let hours = String(Math.floor(totalTimeInSeconds / 3600)).padStart(2, '0');
+                                    let minutes = String(Math.floor((totalTimeInSeconds % 3600) / 60)).padStart(2, '0');
+                                    let seconds = String(totalTimeInSeconds % 60).padStart(2, '0');
+
+                                    let formattedTotalTime = `${hours}:${minutes}:${seconds}`;
+
+                                    calendar.addEvent({
+                                        title: `${personalSchedule.subject} (${formattedTotalTime})`,
+                                        start: eventDate
+                                    });
+                                }
+                            } else {
+                                console.error('잘못된 개인 일정 데이터:', personalSchedule);
+                            }
+                        });
+                    } catch (error) {
+                        console.error('JSON 파싱 오류:', error);
+                        alert('오류: ' + error.message);
+                    }
                 })
                 .catch(error => {
                     console.error('개인 일정 불러오기 오류:', error);
@@ -59,7 +82,7 @@
                 });
         }
 
-        function addEventToUserCalendar(calendar, userCalendarId) {
+        function addEventToUserCalendar(calendar, userId) {
             var title = document.getElementById('eventTitle').value;
             var start = document.getElementById('eventStart').value;
             var end = document.getElementById('eventEnd').value;
@@ -71,16 +94,14 @@
                 end: new Date(end)
             };
 
-            fetch('/userCalendar/events', {
+            fetch('/schedules', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/x-www-form-urlencoded'
                 },
-                body: JSON.stringify({
-                    calendar_id: parseInt(userCalendarId, 10),
-                    title: title,
-                    startDate: event.start.toISOString(),
-                    endDate: event.end.toISOString()
+                body: new URLSearchParams({
+                    userId: userId,
+                    subject: title
                 })
             })
                 .then(response => {
@@ -90,18 +111,17 @@
                             throw new Error(`네트워크 응답이 실패했습니다. 상태 코드: ${response.status}, 내용: ${text}`);
                         });
                     }
-                    return response.json();
+                    return response.text();
                 })
                 .then(data => {
                     calendar.addEvent({
-                        title: data.title,
-                        start: data.startDate,
-                        end: data.endDate
+                        title: event.title,
+                        start: event.start,
+                        end: event.end
                     });
 
                     // 입력 필드 초기화 및 이벤트 모달 숨기기
                     document.getElementById('eventModal').style.display = 'none';
-                    document.getElementById('userCalendar_id').value = '';
                     document.getElementById('eventTitle').value = '';
                     document.getElementById('eventStart').value = '';
                     document.getElementById('eventEnd').value = '';

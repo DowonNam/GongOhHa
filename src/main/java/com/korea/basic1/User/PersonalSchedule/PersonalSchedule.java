@@ -1,5 +1,6 @@
 package com.korea.basic1.User.PersonalSchedule;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.korea.basic1.User.User.SiteUser;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -22,6 +23,7 @@ public class PersonalSchedule {
     private LocalDateTime lastReset;
 
     @ManyToOne
+    @JsonBackReference
     private SiteUser siteUser;
 
 }

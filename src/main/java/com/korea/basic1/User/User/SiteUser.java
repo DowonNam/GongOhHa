@@ -1,5 +1,6 @@
 package com.korea.basic1.User.User;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.korea.basic1.Schedule.Event.Event;
 import com.korea.basic1.Schedule.UserCalendar.UserCalendar;
 import com.korea.basic1.User.Group.Group;
@@ -53,6 +54,7 @@ public class SiteUser {
     }
 
     @OneToMany(mappedBy = "siteUser", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
     private List<PersonalSchedule> personalSchedules;
 
 
