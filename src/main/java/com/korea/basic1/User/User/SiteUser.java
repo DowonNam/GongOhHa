@@ -53,6 +53,7 @@ public class SiteUser {
         }
     }
 
+    // 변경
     @OneToMany(mappedBy = "siteUser", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     private List<PersonalSchedule> personalSchedules;
