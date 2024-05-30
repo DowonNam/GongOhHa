@@ -16,6 +16,7 @@
             justify-content: center;
             align-items: flex-start; /* 네비게이션 바와 컨텐츠를 분리하기 위해 중앙에서 위쪽으로 정렬 */
             height: 100vh;
+            width: 100vw;
         }
         .container {
             display: flex;
@@ -27,6 +28,7 @@
         .book {
             width: 90%;
             max-width: 1200px;
+            min-width: 1200px;
             background: #fff;
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
             display: flex;
@@ -69,15 +71,19 @@
         }
         .chapter-container {
             width: 100%;
-            padding: 20px;
             box-sizing: border-box;
             overflow-y: auto;
+            position:relative;
         }
         .chapter {
-            display: none;
+            width:100%;
+            visibility: hidden;
+            position:absolute;
         }
         .chapter.active {
-            display: block;
+            width:100%;
+            visibility: visible;
+            position:absolute;
         }
     </style>
 
@@ -115,23 +121,23 @@
 
                 <!-- 2번 인덱스 -->
                 <div id="chapter2" class="chapter">
-                    <h2>Chapter 2</h2>
-                    <p>This is the content of Chapter 2.</p>
-                </div>
-
-
-                <!-- 3번 인덱스 -->
-                <div id="chapter3" class="chapter">
-                    <h2>Chapter 3. 나의 스케줄</h2>
-                    <footer th:replace="~{calendar :: calendarFragment}"></footer>
-                </div>
-            </div>
-        </div>
+        <h2>Chapter 2</h2>
+        <p>This is the content of Chapter 2.</p>
     </div>
-    <div>
-        <div class="index-item" onclick="showChapter('chapter1')">내 정보</div>
-        <div class="index-item" onclick="showChapter('chapter2')">질문 목록</div>
-        <div class="index-item" onclick="showChapter('chapter3')">시간표</div>
+
+
+    <!-- 3번 인덱스 -->
+    <div id="chapter3" class="chapter">
+        <h2>Chapter 3. 나의 스케줄</h2>
+        <footer th:replace="~{calendar :: calendarFragment}"></footer>
+    </div>
+</div>
+</div>
+</div>
+<div>
+    <div class="index-item" onclick="showChapter('chapter1')">내 정보</div>
+    <div class="index-item" onclick="showChapter('chapter2')">질문 목록</div>
+    <div class="index-item" onclick="showChapter('chapter3')">시간표</div>
     </div>
 </div>
 </body>
