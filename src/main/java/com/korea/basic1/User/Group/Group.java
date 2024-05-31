@@ -42,4 +42,7 @@ public class Group {
     @OneToMany(mappedBy = "group", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<GroupTag> groupTagList = new ArrayList<>();
 
+    @Transient
+    private int averageStudyTime;
+
 }

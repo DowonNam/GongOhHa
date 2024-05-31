@@ -8,14 +8,60 @@ import org.springframework.stereotype.Service;
 
 import java.security.Principal;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class GroupService {
     private final GroupRepository groupRepository;
     private final UserRepository userRepository;
+
+
+    public Map<Long, Integer> calculateGroupRankings() {
+        List<Group> groups = getAllGroupsWithAverageStudyTime();
+        Map<Long, Integer> groupRankings = new HashMap<>();
+        int rank = 1;
+        int previousAverageStudyTime = -1;
+        int groupsWithSameRank = 0;
+
+        for (Group group : groups) {
+            int currentAverageStudyTime = group.getAverageStudyTime();
+            if (currentAverageStudyTime != previousAverageStudyTime) {
+                rank += groupsWithSameRank;
+                groupsWithSameRank = 1;
+            } else {
+                groupsWithSameRank++;
+            }
+            groupRankings.put(group.getId(), rank);
+            previousAverageStudyTime = currentAverageStudyTime;
+        }
+        return groupRankings;
+    }
+
+    public List<Group> getAllGroupsWithAverageStudyTime() {
+        List<Group> groups = groupRepository.findAll();
+
+        for (Group group : groups) {
+            int totalStudyTime = group.getMembers().stream()
+                    .mapToInt(member -> {
+                        return member.getPersonalSchedules().stream()
+                                .mapToInt(PersonalSchedule::getTodayStudyTime)
+                                .sum();
+                    })
+                    .sum();
+            int memberCount = group.getMembers().size();
+            int averageStudyTime = memberCount > 0 ? totalStudyTime / memberCount : 0;
+            group.setAverageStudyTime(averageStudyTime);
+        }
+
+        return groups.stream()
+                .sorted((g1, g2) -> Integer.compare(g2.getAverageStudyTime(), g1.getAverageStudyTime()))
+                .collect(Collectors.toList());
+    }
 
     public String formatSecondsToHMS(int totalSeconds) {
         int hours = totalSeconds / 3600;

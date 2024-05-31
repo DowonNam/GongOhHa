@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.security.Principal;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -86,12 +87,24 @@ public class GroupController {
     }
 
 
+    @GetMapping("/ranking")
+    public String getGroupRanking(Model model) {
+        List<Group> rankedGroups = groupService.getAllGroupsWithAverageStudyTime();
+        model.addAttribute("rankedGroups", rankedGroups);
+        return "groupRanking";
+    }
+
+
     @GetMapping("/detail/{groupId}")
     public String getGroupDetail(@PathVariable Long groupId, Model model, Principal principal) {
         Group group = groupService.getGroupWithTodayStudyTimes(groupId);
         String averageStudyTime = groupService.calculateGroupAverageStudyTime(groupId);
         String username = principal.getName();
         boolean isLeader = groupService.isLeader(groupId, username);
+
+        // 그룹 순위 계산
+        Map<Long, Integer> groupRankings = groupService.calculateGroupRankings();
+        int groupRank = groupRankings.getOrDefault(groupId, -1); // 순위가 없을 경우 -1 반환
 
         // 멤버들을 가입 날짜와 이름으로 정렬 (null 값을 처리)
         List<SiteUser> sortedMembers = group.getMembers().stream()
@@ -103,6 +116,7 @@ public class GroupController {
         model.addAttribute("isLeader", isLeader);
         model.addAttribute("sortedMembers", sortedMembers); // 정렬된 멤버 리스트 추가
         model.addAttribute("averageStudyTime", averageStudyTime); // 평균 공부 시간 추가
+        model.addAttribute("groupRank", groupRank); // 그룹 순위 추가
         return "groupDetail";
     }
 
