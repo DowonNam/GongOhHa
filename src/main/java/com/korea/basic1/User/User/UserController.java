@@ -40,6 +40,14 @@ public class UserController {
     private final PersonalScheduleService personalScheduleService;
     private final UserRepository userRepository;
 
+    @GetMapping("/calendarPersonalFragment")
+    public String getCalendarPersonalFragment(Model model) {
+        // 필요한 모델 데이터를 추가합니다.
+        model.addAttribute("userCalendarId", "sampleCalendarId");
+        model.addAttribute("userId", "sampleUserId");
+        return "fragments :: calendarPersonalFragment"; // fragments.html 내의 calendarPersonalFragment 부분을 반환
+    }
+
     @GetMapping("/profileModify")
     public String profileModify(ProfileModifyForm profileModifyForm) {
         return "profileModify_form";
