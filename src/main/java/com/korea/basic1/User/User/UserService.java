@@ -65,6 +65,7 @@ public class UserService {
         user.setEmail(email);
         user.setPassword(passwordEncoder.encode(password));
         user.setUserNickname(userNickname);
+        user.setProfileImage(null);
         user.setCreateDate(LocalDateTime.now());
 
         // SiteUser 엔티티를 먼저 저장합니다.
