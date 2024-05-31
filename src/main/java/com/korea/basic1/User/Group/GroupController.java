@@ -89,6 +89,7 @@ public class GroupController {
     @GetMapping("/detail/{groupId}")
     public String getGroupDetail(@PathVariable Long groupId, Model model, Principal principal) {
         Group group = groupService.getGroupWithTodayStudyTimes(groupId);
+        String averageStudyTime = groupService.calculateGroupAverageStudyTime(groupId);
         String username = principal.getName();
         boolean isLeader = groupService.isLeader(groupId, username);
 
@@ -101,6 +102,7 @@ public class GroupController {
         model.addAttribute("group", group);
         model.addAttribute("isLeader", isLeader);
         model.addAttribute("sortedMembers", sortedMembers); // 정렬된 멤버 리스트 추가
+        model.addAttribute("averageStudyTime", averageStudyTime); // 평균 공부 시간 추가
         return "groupDetail";
     }
 

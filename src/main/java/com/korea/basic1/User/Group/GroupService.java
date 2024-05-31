@@ -17,6 +17,24 @@ public class GroupService {
     private final GroupRepository groupRepository;
     private final UserRepository userRepository;
 
+    public String formatSecondsToHMS(int totalSeconds) {
+        int hours = totalSeconds / 3600;
+        int minutes = (totalSeconds % 3600) / 60;
+        int seconds = totalSeconds % 60;
+        return String.format("%02d:%02d:%02d", hours, minutes, seconds);
+    }
+
+    public String calculateGroupAverageStudyTime(Long groupId) {
+        Group group = getGroupWithTodayStudyTimes(groupId);
+        int totalStudyTime = group.getMembers().stream()
+                .mapToInt(SiteUser::getTodayStudyTime)
+                .sum();
+        int memberCount = group.getMembers().size();
+        int averageStudyTime = memberCount > 0 ? totalStudyTime / memberCount : 0;
+
+        return formatSecondsToHMS(averageStudyTime);
+    }
+
     public Group getGroupWithTodayStudyTimes(Long groupId) {
         Group group = groupRepository.findById(groupId)
                 .orElseThrow(() -> new IllegalArgumentException("그룹을 찾을 수 없습니다."));
