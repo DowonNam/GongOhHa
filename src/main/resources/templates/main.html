@@ -38,31 +38,31 @@
                         <li><a th:href="@{userCalendar/5}">시험 일정 달력</a></li>
                         <li><a sec:authorize="isAuthenticated()" th:href="@{|/user/studyBoard/${#authentication.principal.username}|}">나의 공부 일정</a></li>
                         <li><a sec:authorize="isAuthenticated()" th:href="@{/group/list}">그룹 리스트</a></li>
-                        <li>
-                            <details open>
-                                <summary>게시판</summary>
-                                <ul>
-                                    <li>
-                                        <details open>
-                                            <summary>공부 게시판</summary>
-                                            <ul>
-                                                <li><a th:href="@{/question/list}">질문 게시판</a></li>
-                                                <li><a th:href="@{/question/list}">자료 공유 게시판</a></li>
-                                            </ul>
-                                        </details>
-                                    </li>
-                                    <li>
-                                        <details open>
-                                            <summary>자유 게시판</summary>
-                                            <ul>
-                                                <li><a>Submenu 1</a></li>
-                                                <li><a>Submenu 2</a></li>
-                                            </ul>
-                                        </details>
-                                    </li>
-                                </ul>
-                            </details>
-                        </li>
+<!--                        <li>-->
+<!--                            <details open>-->
+<!--                                <summary>게시판</summary>-->
+<!--                                <ul>-->
+<!--                                    <li>-->
+<!--                                        <details open>-->
+<!--                                            <summary>공부 게시판</summary>-->
+<!--                                            <ul>-->
+<!--                                                <li><a th:href="@{/question/list}">질문 게시판</a></li>-->
+<!--                                                <li><a th:href="@{/question/list}">자료 공유 게시판</a></li>-->
+<!--                                            </ul>-->
+<!--                                        </details>-->
+<!--                                    </li>-->
+<!--                                    <li>-->
+<!--                                        <details open>-->
+<!--                                            <summary>자유 게시판</summary>-->
+<!--                                            <ul>-->
+<!--                                                <li><a>Submenu 1</a></li>-->
+<!--                                                <li><a>Submenu 2</a></li>-->
+<!--                                            </ul>-->
+<!--                                        </details>-->
+<!--                                    </li>-->
+<!--                                </ul>-->
+<!--                            </details>-->
+<!--                        </li>-->
                         <li><a></a></li>
                     </ul>
                 </div>
