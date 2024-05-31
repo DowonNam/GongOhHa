@@ -85,27 +85,24 @@ public class GroupController {
         return ResponseEntity.ok(groups);
     }
 
+
     @GetMapping("/detail/{groupId}")
     public String getGroupDetail(@PathVariable Long groupId, Model model, Principal principal) {
-        Optional<Group> groupOpt = groupRepository.findById(groupId);
-        if (groupOpt.isPresent()) {
-            Group group = groupOpt.get();
-            String username = principal.getName();
-            boolean isLeader = groupService.isLeader(groupId, username);
+        Group group = groupService.getGroupWithTodayStudyTimes(groupId);
+        String username = principal.getName();
+        boolean isLeader = groupService.isLeader(groupId, username);
 
-            // 멤버들을 가입 날짜와 이름으로 정렬 (null 값을 처리)
-            List<SiteUser> sortedMembers = group.getMembers().stream()
-                    .sorted(Comparator.comparing(SiteUser::getCreateDate, Comparator.nullsLast(Comparator.naturalOrder()))
-                            .thenComparing(SiteUser::getUserNickname, Comparator.nullsLast(Comparator.naturalOrder())))
-                    .collect(Collectors.toList());
+        // 멤버들을 가입 날짜와 이름으로 정렬 (null 값을 처리)
+        List<SiteUser> sortedMembers = group.getMembers().stream()
+                .sorted(Comparator.comparing(SiteUser::getCreateDate, Comparator.nullsLast(Comparator.naturalOrder()))
+                        .thenComparing(SiteUser::getUserNickname, Comparator.nullsLast(Comparator.naturalOrder())))
+                .collect(Collectors.toList());
 
-            model.addAttribute("group", group);
-            model.addAttribute("isLeader", isLeader);
-            model.addAttribute("sortedMembers", sortedMembers); // 정렬된 멤버 리스트 추가
-            return "groupDetail";
-        } else {
-            return "error/404";
-        }
+        model.addAttribute("group", group);
+        model.addAttribute("isLeader", isLeader);
+        model.addAttribute("sortedMembers", sortedMembers); // 정렬된 멤버 리스트 추가
+        return "groupDetail";
     }
+
 
 }

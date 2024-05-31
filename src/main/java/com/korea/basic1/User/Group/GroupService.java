@@ -1,5 +1,6 @@
 package com.korea.basic1.User.Group;
 
+import com.korea.basic1.User.PersonalSchedule.PersonalSchedule;
 import com.korea.basic1.User.User.SiteUser;
 import com.korea.basic1.User.User.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +16,20 @@ import java.util.Optional;
 public class GroupService {
     private final GroupRepository groupRepository;
     private final UserRepository userRepository;
+
+    public Group getGroupWithTodayStudyTimes(Long groupId) {
+        Group group = groupRepository.findById(groupId)
+                .orElseThrow(() -> new IllegalArgumentException("그룹을 찾을 수 없습니다."));
+
+        for (SiteUser member : group.getMembers()) {
+            int todayStudyTime = member.getPersonalSchedules().stream()
+                    .mapToInt(PersonalSchedule::getTodayStudyTime)
+                    .sum();
+            member.setTodayStudyTime(todayStudyTime);
+        }
+
+        return group;
+    }
 
     // GroupService에 추가
     public boolean isLeader(Long groupId, String username) {

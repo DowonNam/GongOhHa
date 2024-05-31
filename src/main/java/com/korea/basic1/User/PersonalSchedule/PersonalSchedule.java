@@ -26,4 +26,12 @@ public class PersonalSchedule {
     @JsonBackReference
     private SiteUser siteUser;
 
+    public int getTodayStudyTime() {
+        LocalDateTime now = LocalDateTime.now();
+        if (lastReset != null && lastReset.toLocalDate().isEqual(now.toLocalDate())) {
+            return totalTime;
+        }
+        return 0;
+    }
+
 }

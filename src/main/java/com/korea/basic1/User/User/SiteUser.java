@@ -65,4 +65,7 @@ public class SiteUser {
 
     @ManyToMany(mappedBy = "members")
     private Set<Group> groups = new HashSet<>();
+
+    @Transient
+    private int todayStudyTime;
 }

@@ -146,6 +146,7 @@
                     <th>멤버 이름</th>
                     <th>멤버 프로필</th>
                     <th>멤버 가입일</th>
+                    <th>오늘 공부 시간</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -155,6 +156,7 @@
                         <a class="btn btn-info btn-xs" th:href="@{/user/profile/{userNickname}(userNickname=${member.userNickname})}">Details</a>
                     </td>
                     <td th:text="${member.createDate}"></td>
+                    <td th:text="${member.todayStudyTime}"></td>
                 </tr>
                 </tbody>
             </table>
