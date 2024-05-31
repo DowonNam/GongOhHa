@@ -41,7 +41,8 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf
                         .ignoringRequestMatchers(
                                 new AntPathRequestMatcher("/userCalendar/**"),
-                                new AntPathRequestMatcher("/study-time")
+                                new AntPathRequestMatcher("/study-time"),
+                                new AntPathRequestMatcher("/api/user/profile-image") // CSRF 보호에서 제외
                         )
                 );
         return http.build();

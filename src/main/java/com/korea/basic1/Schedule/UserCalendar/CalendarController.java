@@ -43,18 +43,14 @@ public class CalendarController {
     @PutMapping("/modify/{eventId}")
     public ResponseEntity<?> modifyEvent(@PathVariable Long eventId, @RequestBody EventForm eventForm) {
         try {
-            // 클라이언트로부터 전송된 이벤트 정보를 사용하여 이벤트를 수정합니다.
             Event modifiedEvent = eventService.modify(eventId, eventForm.getTitle(), eventForm.getStartDate(),
                     eventForm.getEndDate(), eventForm.getRegistrationLink(), eventForm.getCalendar_id());
             if (modifiedEvent != null) {
-                // 수정된 이벤트가 성공적으로 반환되면 200 OK 응답을 반환합니다.
                 return ResponseEntity.ok(modifiedEvent);
             } else {
-                // 수정된 이벤트를 찾을 수 없는 경우 404 Not Found 응답을 반환합니다.
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("{\"error\":\"Event not found.\"}");
             }
         } catch (Exception e) {
-            // 서버 내부 오류가 발생한 경우 500 Internal Server Error 응답을 반환합니다.
             Logger.getLogger(CalendarController.class.getName()).log(Level.SEVERE, "Internal server error", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("{\"error\":\"Internal server error occurred.\"}");
         }

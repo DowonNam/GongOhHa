@@ -10,7 +10,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
@@ -21,6 +23,33 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final CalendarService calendarService;
+
+
+    public SiteUser modifyProfile(SiteUser user, String userNickname, String email, MultipartFile profileImage) {
+        user.setUserNickname(userNickname);
+        user.setEmail(email);
+        if (profileImage != null && !profileImage.isEmpty()) {
+            try {
+                byte[] imageData = profileImage.getBytes();
+                user.setProfileImage(imageData);
+            } catch (IOException e) {
+                e.printStackTrace();
+                // 예외 처리 필요
+            }
+        }
+        return this.userRepository.save(user);
+    }
+
+
+    public SiteUser findById(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+    }
+
+    public SiteUser findByUsername(String username) {
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+    }
 
     @Transactional
     public SiteUser create(String username, String email, String password, String userNickname) {

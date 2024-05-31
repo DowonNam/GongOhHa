@@ -7,20 +7,24 @@ import com.korea.basic1.Board.Comment.Comment;
 import com.korea.basic1.Board.Comment.CommentService;
 import com.korea.basic1.Board.Question.Question;
 import com.korea.basic1.Board.Question.QuestionService;
+import com.korea.basic1.DataNotFoundException;
 import com.korea.basic1.Security.MyUser;
 import com.korea.basic1.User.PersonalSchedule.PersonalSchedule;
 import com.korea.basic1.User.PersonalSchedule.PersonalScheduleService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.security.Principal;
 import java.util.List;
 
@@ -34,6 +38,50 @@ public class UserController {
     private final CommentService commentService;
     private final AnswerService answerService;
     private final PersonalScheduleService personalScheduleService;
+    private final UserRepository userRepository;
+
+    @GetMapping("/profileModify")
+    public String profileModify(ProfileModifyForm profileModifyForm) {
+        return "profileModify_form";
+    }
+
+    @PostMapping("/profileModify")
+    public String profileModify(@Valid ProfileModifyForm profileModifyForm,
+                                BindingResult bindingResult, Principal principal, Model model) {
+        if (bindingResult.hasErrors()) {
+            return "profileModify_form";
+        }
+        try {
+            String username = principal.getName(); // 현재 로그인한 사용자의 username
+            SiteUser user = this.userService.getUser(username);
+            String newNickname = profileModifyForm.getUserNickname();
+            String newEmail = profileModifyForm.getEmail();
+            MultipartFile profileImage = profileModifyForm.getProfileImage(); // 프로필 이미지 가져오기
+
+            // 이메일이 비어있으면 기존 이메일로 설정
+            if (newEmail == null || newEmail.isEmpty()) {
+                newEmail = user.getEmail();
+            }
+
+            if (newNickname == null || newNickname.isEmpty()){
+                newNickname = user.getUserNickname();
+            }
+
+            this.userService.modifyProfile(user, newNickname, newEmail, profileImage); // 프로필 이미지도 함께 수정
+            return String.format("redirect:/user/profile/%s", username);
+        } catch (DataNotFoundException e) {
+            model.addAttribute("error", "사용자가 존재하지 않습니다.");
+            return "profileModify_form";
+        }
+    }
+    @GetMapping("/profile")
+    public String getUserProfile(Model model) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        SiteUser user = userService.findByUsername(username);
+        model.addAttribute("user", user);
+        return "userProfile_form";
+    }
 
     @GetMapping("/studyBoard/{username}")
     public String userBoard(Model model, Principal principal) {

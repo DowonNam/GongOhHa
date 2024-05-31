@@ -8,6 +8,7 @@ import com.korea.basic1.User.PersonalSchedule.PersonalSchedule;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -34,6 +35,14 @@ public class SiteUser {
     @Lob
     private byte[] profileImage;
 
+    public String getBase64EncodedProfileImage() {
+        if (profileImage != null) {
+            return Base64.getEncoder().encodeToString(profileImage);
+        } else {
+            return ""; // 프로필 이미지가 없는 경우 빈 문자열을 반환
+        }
+    }
+
     @ManyToMany
     @JoinTable(
             name = "user_event",
@@ -44,20 +53,9 @@ public class SiteUser {
 
     private LocalDateTime createDate;
 
-    public String getBase64EncodedProfileImage() {
-        if (profileImage != null) {
-            return Base64.getEncoder().encodeToString(profileImage);
-        } else {
-            // 프로필 이미지가 없는 경우 기본 이미지를 반환하거나 빈 문자열을 반환할 수 있습니다.
-            return ""; // 빈 문자열 반환
-        }
-    }
-
-    // 변경
     @OneToMany(mappedBy = "siteUser", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     private List<PersonalSchedule> personalSchedules;
-
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "calendar_id")
@@ -68,4 +66,5 @@ public class SiteUser {
 
     @Transient
     private int todayStudyTime;
+
 }

@@ -1,4 +1,4 @@
-    <div th:fragment="calendarFragment" th:with="calendarId=${userCalendarId}">
+<div th:fragment="calendarFragment" th:with="calendarId=${userCalendarId}">
     <div>
         <div id="userCalendar" th:data-calendar-id="${userCalendarId}"></div>
         <div id="userId" th:data-user-id="${userId}"></div>
@@ -22,6 +22,24 @@
             </div>
         </div>
 
+        <!-- 일정 수정 모달 -->
+        <div id="modifyEventModal"
+             style="display:none; position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%); background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); z-index: 1000;">
+            <div>
+                <input type="hidden" id="modifyEventId">
+                <label>제목:</label>
+                <input type="text" id="modifyEventTitle"><br>
+                <label>시작 시간:</label>
+                <input type="datetime-local" id="modifyEventStart"><br>
+                <label>종료 시간:</label>
+                <input type="datetime-local" id="modifyEventEnd"><br>
+                <button id="modifyEvent"
+                        style="border-radius: 10px; padding: 10px 20px; border: none; background-color: black; color: white; text-align: center; display: inline-block; font-size: 16px; cursor: pointer;">
+                    이벤트 수정
+                </button>
+            </div>
+        </div>
+
         <!-- 일정 추가 버튼 -->
         <div class="flex justify-between mt-4">
             <button id="addEventBtn"
@@ -34,6 +52,7 @@
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/long/dist/long.js"></script> <!-- Long.js 라이브러리 추가 -->
     <script>
+
         document.addEventListener('DOMContentLoaded', function () {
             var calendarEl = document.getElementById('userCalendar');
             var userCalendarId = calendarEl.getAttribute('data-calendar-id');
@@ -50,8 +69,11 @@
 
             var calendar = new FullCalendar.Calendar(calendarEl, {
                 initialView: 'dayGridMonth',
+                eventClick: function(info) {
+                    openModifyModal(info.event);
+                }
             });
-            calendar.render(); // FullCalendar 인스턴스를 렌더링합니다.
+            calendar.render();
 
             // 캘린더 ID로 이벤트 불러오기
             fetchEventsForUserCalendar(userCalendarId, calendar);
@@ -59,12 +81,17 @@
             document.getElementById('saveEvent').addEventListener('click', function () {
                 addEventToUserCalendar(calendar, userCalendarId);
             });
+
+            // 이 부분을 추가하여 calendar가 정의된 후에 이벤트 리스너를 등록합니다.
+            document.getElementById('modifyEvent').addEventListener('click', function () {
+                modifyEventInUserCalendar(calendar);
+            });
         });
 
         function fetchEventsForUserCalendar(userCalendarId, calendar) {
             fetch(`http://localhost:8088/userCalendar/${userCalendarId}/events`)
                 .then(response => {
-                    console.log('Response status:', response.status, response.statusText); // 응답 상태 로그 추가
+                    console.log('Response status:', response.status, response.statusText);
                     if (!response.ok) {
                         return response.text().then(text => {
                             throw new Error(`서버에서 정상적인 응답을 받지 못했습니다. 상태 코드: ${response.status}, 내용: ${text}`);
@@ -77,9 +104,9 @@
                     return response.json();
                 })
                 .then(eventsData => {
-                    // 가져온 이벤트 데이터를 FullCalendar에 추가
                     eventsData.forEach(event => {
                         calendar.addEvent({
+                            id: event.id,
                             title: event.title,
                             start: event.startDate,
                             end: event.endDate
@@ -96,11 +123,10 @@
             var title = document.getElementById('eventTitle').value;
             var start = new Date(document.getElementById('eventStart').value);
             var end = new Date(document.getElementById('eventEnd').value);
-            var registrationLink = ""; // 만약 registrationLink가 필요하다면 이곳에서 값을 설정하세요
+            var registrationLink = "";
             start.setTime(start.getTime() + (9 * 60 * 60 * 1000));
             end.setTime(end.getTime() + (9 * 60 * 60 * 1000));
 
-            // 이벤트 객체를 생성합니다.
             var event = {
                 title: title,
                 start: new Date(start),
@@ -120,96 +146,89 @@
                     registrationLink: registrationLink
                 })
             })
-                .then(response => {
-                    console.log('Response status:', response.status, response.statusText); // 응답 상태 로그 추가
-                    if (!response.ok) {
-                        return response.text().then(text => {
-                            throw new Error(`네트워크 응답이 실패했습니다. 상태 코드: ${response.status}, 내용: ${text}`);
-                        });
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    calendar.addEvent({
-                        title: data.title,
-                        start: data.startDate,
-                        end: data.endDate
+            .then(response => {
+                console.log('Response status:', response.status, response.statusText);
+                if (!response.ok) {
+                    return response.text().then(text => {
+                        throw new Error(`네트워크 응답이 실패했습니다. 상태 코드: ${response.status}, 내용: ${text}`);
                     });
-
-                    // 입력 필드 초기화 및 이벤트 모달 숨기기
-                    document.getElementById('eventModal').style.display = 'none';
-                    document.getElementById('userCalendar_id').value = '';
-                    document.getElementById('eventTitle').value = '';
-                    document.getElementById('eventStart').value = '';
-                    document.getElementById('eventEnd').value = '';
-                })
-                .catch(error => {
-                    console.error('오류:', error);
-                    alert('오류: ' + error.message);
+                }
+                return response.json();
+            })
+            .then(data => {
+                calendar.addEvent({
+                    id: data.id,
+                    title: data.title,
+                    start: data.startDate,
+                    end: data.endDate
                 });
+
+                document.getElementById('eventModal').style.display = 'none';
+                document.getElementById('userCalendar_id').value = '';
+                document.getElementById('eventTitle').value = '';
+                document.getElementById('eventStart').value = '';
+                document.getElementById('eventEnd').value = '';
+            })
+            .catch(error => {
+                console.error('오류:', error);
+                alert('오류: ' + error.message);
+            });
         }
 
-        function openModal(button) {
-            var eventId = button.getAttribute('data-id');
-            var modalId = 'eventModal_' + eventId;
-            var modal = document.getElementById(modalId);
-
-            if (modal) {
-                modal.showModal();
-            } else {
-                console.error("Modal not found with ID:", modalId);
-            }
+        function openModifyModal(event) {
+            document.getElementById('modifyEventId').value = event.id;
+            document.getElementById('modifyEventTitle').value = event.title;
+            document.getElementById('modifyEventStart').value = event.start.toISOString().slice(0, 16);
+            document.getElementById('modifyEventEnd').value = event.end.toISOString().slice(0, 16);
+            document.getElementById('modifyEventModal').style.display = 'block';
         }
 
-        function saveModifiedEvent(button) {
-            var eventId = button.getAttribute('data-id');
-            var modifiedEventTitle = document.getElementById('modifiedEventTitle_' + eventId).value;
-            var modifiedEventStart = new Date(document.getElementById('modifiedEventStart_' + eventId).value);
-    var modifiedEventEnd = new Date(document.getElementById('modifiedEventEnd_' + eventId).value);
+        function modifyEventInUserCalendar(calendar) {
+            var eventId = document.getElementById('modifyEventId').value;
+            var title = document.getElementById('modifyEventTitle').value;
+            var start = new Date(document.getElementById('modifyEventStart').value);
+            var end = new Date(document.getElementById('modifyEventEnd').value);
+            start.setTime(start.getTime() + (9 * 60 * 60 * 1000));
+            end.setTime(end.getTime() + (9 * 60 * 60 * 1000));
 
-    modifiedEventStart.setTime(modifiedEventStart.getTime() + (9 * 60 * 60 * 1000));
-    modifiedEventEnd.setTime(modifiedEventEnd.getTime() + (9 * 60 * 60 * 1000));
-
-
-            console.log("Saving event:", eventId, modifiedEventTitle, modifiedEventStart, modifiedEventEnd);
-
-            var updatedEvent = {
-                title: modifiedEventTitle,
-                startDate: new Date(modifiedEventStart).toISOString(),
-                endDate: new Date(modifiedEventEnd).toISOString()
+            var event = {
+                id: eventId,
+                title: title,
+                start: new Date(start),
+                end: new Date(end)
             };
-
-            console.log("Updated event data:", updatedEvent);
-
-            if (eventId === '0' || !eventId) {
-                console.error("Invalid event ID:", eventId);
-                return;
-            }
 
             fetch(`/userCalendar/modify/${eventId}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(updatedEvent)
+                body: JSON.stringify({
+                    title: title,
+                    startDate: event.start.toISOString(),
+                    endDate: event.end.toISOString(),
+                    registrationLink: ""
+                })
             })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('이벤트 수정 실패');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    console.log("Event updated successfully", data);
-                })
-                .catch(error => {
-                    console.error('이벤트 수정 오류:', error);
-                });
-        }
+            .then(response => {
+                if (!response.ok) {
+                    return response.text().then(text => {
+                        throw new Error(`네트워크 응답이 실패했습니다. 상태 코드: ${response.status}, 내용: ${text}`);
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                var existingEvent = calendar.getEventById(eventId);
+                existingEvent.setProp('title', data.title);
+                existingEvent.setDates(new Date(data.startDate), new Date(data.endDate));
 
-        function closeModal(modalId) {
-            var modal = document.getElementById(modalId);
-            modal.close();
+                document.getElementById('modifyEventModal').style.display = 'none';
+            })
+            .catch(error => {
+                console.error('오류:', error);
+                alert('오류: ' + error.message);
+            });
         }
     </script>
 </div>

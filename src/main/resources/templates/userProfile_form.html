@@ -1,144 +1,58 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Book Layout with Chapters</title>
-    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.10.2/dist/full.min.css" rel="stylesheet" type="text/css"/>
+    <title>나의 프로필</title>
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.10.2/dist/full.min.css" rel="stylesheet" type="text/css" />
     <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background: #f0f0f0;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start; /* 네비게이션 바와 컨텐츠를 분리하기 위해 중앙에서 위쪽으로 정렬 */
-            height: 100vh;
-            width: 100vw;
-        }
-        .container {
-            display: flex;
-            align-items: flex-start;
-            width: 90%;
-            height: calc(100vh - 60px); /* 네비게이션 바 높이를 제외한 높이 */
-            padding-top: 60px; /* 네비게이션 바의 높이만큼 여유 공간 */
-        }
-        .book {
-            width: 90%;
-            max-width: 1200px;
-            min-width: 1200px;
-            background: #fff;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            position: relative;
-            height: 100%; /* 부모 컨테이너의 높이를 채우도록 설정 */
-        }
-        .header {
-            padding: 20px;
-            text-align: center;
-            border-bottom: 1px solid #ccc;
-            background-color: #f9f9f9;
-        }
-        .header h1 {
-            margin: 0;
-            padding: 0;
-        }
-        .header p {
-            margin: 0;
-            padding: 0;
-        }
-        .index-item {
-            width: auto; /* 필요에 따라 너비 조정 */
-            height: auto; /* 필요에 따라 높이 조정 */
-            background-color: yellow;
-            cursor: pointer;
-            transition: background-color 0.3s;
-            margin-bottom: 5px;
-            padding: 5px 10px; /* 더 나은 간격을 위해 패딩 추가 */
-            text-align: center; /* 텍스트 중앙 정렬 */
-        }
-        .index-item:hover {
-            background-color: #ffeb3b;
-        }
-        .content {
-            display: flex;
-            flex-grow: 1;
-            height: 100%; /* 부모 컨테이너의 높이를 채우도록 설정 */
-        }
-        .chapter-container {
-            width: 100%;
-            box-sizing: border-box;
-            overflow-y: auto;
-            position:relative;
-        }
-        .chapter {
-            width:100%;
-            visibility: hidden;
-            position:absolute;
-        }
-        .chapter.active {
-            width:100%;
-            visibility: visible;
-            position:absolute;
-        }
-    </style>
-
-    <!-- 네비게이션 바 -->
-    <nav th:replace="~{navbar :: navbarFragment}" class="navbar fixed top-0 z-50 h-12"></nav>
-
-    <script>
-        function showChapter(chapterId) {
-            const chapters = document.querySelectorAll('.chapter');
-            chapters.forEach(chapter => chapter.classList.remove('active'));
-            document.getElementById(chapterId).classList.add('active');
-        }
-    </script>
 </head>
+
 <body>
-<div class="container">
-    <div class="book">
-        <div class="content">
-            <div class="chapter-container">
+<!-- 네비게이션 바 -->
+<nav th:replace="~{navbar :: navbarFragment}" class="navbar fixed top-0 z-50 h-12"></nav>
 
-                <!-- 1번 인덱스 -->
-                <div id="chapter1" class="chapter active">
-                    <h1 style="text-align: center; font-weight: bold; font-size: 24px;">
-                        <span style="background-color: yellow; padding: 0 5px;">내 정보</span>
-                    </h1>
-                    <hr style="margin: 20px 0;"> <!-- 수평선과 간격을 위한 스타일 추가 -->
-                    <!--사진-->
-                    <div class="avatar" style="text-align: center; margin-top: 20px;">
-                        <div class="w-60 rounded-full ring">
-                            <img src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg"
-                                 style="display: block;"/>
-                        </div>
-                    </div>
-                </div>
+<div class="flex justify-center items-start h-screen mt-16">
+    <div class="flex flex-col gap-4 mt-16 mx-auto w-2/4 border border-gray-300 p-4 rounded-xl">
+    <!-- 프로필 섹션 -->
+    <div class="flex gap-4 items-center">
+        <div class="w-40 h-40 rounded-full overflow-hidden">
+            <img th:if="${user.base64EncodedProfileImage != ''}" th:src="'data:image/png;base64,' + ${user.base64EncodedProfileImage}" alt="User's Profile Image" class="w-100 h-100" />
+            <img th:if="${user.base64EncodedProfileImage == ''}" src="data:image/png;base64,${user.getBase64EncodedProfileImage()}" alt="User's Profile Image" class="w-100 h-100" />
+        </div>
+        <div class="flex flex-col gap-4">
+            <h1 sec:authorize="isAuthenticated()" th:text="${#authentication.principal.username}">User Profile</h1>
+            <div class="flex flex-col gap-1">
+                <p sec:authorize="isAuthenticated()" th:text="${email}">user@example.com</p>
+            </div>
+            <div class="flex flex-col gap-1">
+                <p sec:authorize="isAuthenticated()" th:text="${userNickname}">User Nickname</p>
+            </div>
+            <div>
+                <a class="text-decoration-none custom-btn border-0 font-bold" sec:authorize="isAuthenticated()" th:href="@{/user/profileModify}">프로필 수정</a>
+            </div>
+        </div>
+        <!-- 버튼 섹션 -->
+        <div class="flex justify-center gap-4 mt-4">
+            <!-- 프로필 수정 버튼 -->
 
-<!--                &lt;!&ndash; 2번 인덱스 &ndash;&gt;-->
-<!--                <div id="chapter2" class="chapter">-->
-<!--        <h2>Chapter 2</h2>-->
-<!--        <p>This is the content of Chapter 2.</p>-->
-<!--    </div>-->
-
-
-    <!-- 3번 인덱스 -->
-    <div id="chapter3" class="chapter">
-        <h2>Chapter 3. 나의 스케줄</h2>
+        </div>
+    </div>
+    <hr>
+    <!-- 스케줄 섹션 -->
+    <div>
         <footer th:replace="~{calendar :: calendarFragment}"></footer>
     </div>
 </div>
+
 </div>
-</div>
-<div>
-    <div class="index-item" onclick="showChapter('chapter1')">내 정보</div>
-<!--    <div class="index-item" onclick="showChapter('chapter2')">질문 목록</div>-->
-    <div class="index-item" onclick="showChapter('chapter3')">시간표</div>
-    </div>
-</div>
+
+<script>
+    function showChapter(chapterId) {
+        const chapters = document.querySelectorAll('.chapter');
+        chapters.forEach(chapter => chapter.classList.remove('active'));
+        document.getElementById(chapterId).classList.add('active');
+    }
+</script>
 </body>
+
 </html>

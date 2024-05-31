@@ -16,13 +16,15 @@ public class MyUser implements OAuth2User, UserDetails {
     private final String username;
     private final String userNickname;
     private final String password;
+    private final String base64EncodedProfileImage; // 새로운 속성 추가
     private final Collection<? extends GrantedAuthority> authorities;
     private final Map<String, Object> attributes = new HashMap<>();
 
     MyUser(SiteUser user, Collection<? extends GrantedAuthority> authorities) {
         this.username = user.getUsername();
         this.userNickname = user.getUserNickname();
-        this.password =  user.getPassword();
+        this.password = user.getPassword();
+        this.base64EncodedProfileImage = user.getBase64EncodedProfileImage(); // SiteUser에서 해당 값 받아오기
         this.authorities = authorities;
         attributes.put("userNickname", userNickname);
     }
@@ -46,6 +48,7 @@ public class MyUser implements OAuth2User, UserDetails {
     public String getPassword() {
         return this.password;
     }
+
     @Override
     public String getUsername() {
         return username;
@@ -75,4 +78,5 @@ public class MyUser implements OAuth2User, UserDetails {
     public String getName() {
         return userNickname;
     }
+
 }
