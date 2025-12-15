@@ -1,45 +1,81 @@
-# 📝 공.오.하 (공부는 오늘부터 하자)
-> **"나만의 학습 일정을 관리하고 공유하는 커뮤니티 서비스"**
-> Spring Boot와 JPA를 활용한 웹 애플리케이션 개발 입문 개인 프로젝트입니다.
+[Portfolio] Web Developer 남도원
+🔗 GitHub: https://github.com/DowonNam 🔗 Tech Blog: https://velog.io/@ndw4797/posts
 
-<br>
+1. HoneyBadger (기업용 협업 및 커뮤니케이션 도구)
+"NHN Dooray와 유사한 올인원 협업 솔루션 개발 프로젝트"
 
-## 📅 프로젝트 소개
-- **개발 기간:** 2024.04 ~ 2024.05 (1개월)
-- **개발 인원:** 1명 (Personal Project)
-- **주요 목표:**
-  - 기획부터 DB 설계, 기능 구현까지 웹 서비스 전반의 프로세스 경험
-  - RDB(MySQL) 설계를 통한 데이터 관계(ERD) 이해 및 정규화 적용
+개발 기간: 2024.07 ~ 2024.08 (6주, 5인 팀 프로젝트)
 
-<br>
+관련 링크: GitHub Repository 바로가기
 
-## 🛠️ Tech Stack
-- **Language:** Java, JavaScript
-- **Framework:** Spring Boot, Spring Security
-- **Database:** MySQL
-- **Frontend:** HTML/CSS, Thymeleaf (Server-side Rendering)
-- **Tools:** IntelliJ, Git
+주요 역할: 백엔드(전자결재, 메일), 프론트엔드(채팅 UI), CI/CD 구축
 
-<br>
+사용 기술: Java, Spring Boot, MySQL, JPA, WebSocket(STOMP), Docker, AWS EC2
 
-## 💡 Key Features (주요 기능)
+핵심 구현 내용:
 
-### 1. 학습 일정 관리 (Scheduler)
-- 개인별 학습 계획을 달력(Calendar) 형태로 등록 및 수정 기능
-- '오늘 할 일' 체크리스트 관리
+전자결재 시스템: 기안-승인-반려-결재완료로 이어지는 상태값(State) 관리 로직 구현
 
-### 2. 정보 공유 게시판 (Community)
-- 회원 간 학습 팁 공유를 위한 게시글 CRUD(작성, 조회, 수정, 삭제)
-- 카테고리별 게시글 분류 및 페이징(Pagination) 처리
+실시간 채팅: WebSocket과 STOMP 프로토콜을 활용한 실시간 부서별 그룹 채팅 구현
 
-### 3. 회원 관리 (User)
-- Spring Security를 활용하지 않은 상태에서, Session 기반의 로그인/로그아웃 직접 구현
-- CSRF 토큰 검증 로직 학습 및 적용을 통한 보안 기초 이해
+CI/CD 자동화: GitHub Actions와 Docker를 활용하여 AWS EC2에 무중단 배포 환경 구축
 
-<br>
+Troubleshooting (문제 해결):
 
-## 📚 Learning Point (배운 점)
-- **DB 모델링의 중요성:** 회원, 게시글, 댓글, 일정 등 엔티티 간의 다대일(N:1) 관계를 직접 설계하며 ERD 작성 능력을 길렀습니다.
-- **보안 기초:** 프레임워크의 도움 없이 보안 로직을 고민해보며, 웹 공격(CSRF 등)의 원리와 방어 방법에 대해 학습했습니다.
+API 데이터 불일치: 프론트/백엔드 협업 시 발생하는 데이터 규격 차이를 해결하기 위해 API 명세서를 사전 확정하고 DTO(Data Transfer Object)를 도입하여 커뮤니케이션 비용 절감
 
-<br>
+배포 환경 경로 오류: 로컬(Windows)과 서버(Linux)의 파일 경로 차이로 인한 업로드 오류를 환경 변수 설정 및 상대 경로 적용으로 해결
+
+2. MMP (Make Muscle Project - 헬스장 전용 관리 웹)
+"회원권 관리부터 커뮤니티까지, 헬스장 운영 효율화 플랫폼"
+
+개발 기간: 2024.05 ~ 2024.06 (1개월, 4인 팀 프로젝트)
+
+관련 링크: GitHub Repository 바로가기
+
+주요 역할: 회원 관리(로그인/출석), 챌린지 기능, 서버 배포
+
+사용 기술: Java, Spring Boot, MySQL, AWS EC2
+
+핵심 구현 내용:
+
+회원/이용권 관리: 기간제/횟수제 이용권 차감 자동화 로직 및 출석 체크 기능 구현
+
+챌린지 랭킹: 사용자의 운동 기록 데이터를 기반으로 실시간 랭킹 산정 시스템 개발
+
+Troubleshooting (문제 해결):
+
+Nginx 정적 파일 처리: AWS 배포 후 이미지 로딩 실패 문제를 Nginx의 Reverse Proxy 설정 및 정적 리소스 경로 매핑을 통해 해결
+
+3. 공.오.하 (공부는 오늘부터 하자 - 학습 커뮤니티)
+"개인 학습 일정 관리 및 정보 공유 커뮤니티"
+
+개발 기간: 2024.04 ~ 2024.05 (1개월, 개인 프로젝트)
+
+관련 링크: GitHub Repository 바로가기
+
+주요 역할: Full-Stack 개발 (기획, DB설계, 구현 전체)
+
+핵심 구현 내용:
+
+DB 모델링: 회원, 게시판, 일정(Calendar) 간의 관계(ERD) 설계 및 정규화 적용
+
+개발 기록: Velog를 통해 프로젝트 기획부터 구현 단계별 트러블슈팅 과정을 상세히 기록
+
+보안 기초: CSRF 공격 방어를 위한 토큰 검증 로직 학습 및 적용
+
+[문서 내용 복사 끝]
+2️⃣ [링크 URL] 입력칸 최종 전략 (3개 입력)
+질문하신 대로 허니뱃저만 따로 빼는 전략이 아주 좋습니다. 담당자가 보자마자 클릭하게 만드세요!
+
+[GitHub Project] https://github.com/DowonNam/HoneyBadger
+
+(설명: 🚀 핵심 프로젝트: NHN Dooray 벤치마킹 협업 툴)
+
+[Tech Blog] https://velog.io/@ndw4797/posts
+
+(설명: 🔧 트러블슈팅(동시성 이슈 등) 및 기술 학습 기록)
+
+[GitHub Main] https://github.com/DowonNam
+
+(설명: 📂 전체 프로젝트 소스코드)
